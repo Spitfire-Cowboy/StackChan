@@ -13,6 +13,7 @@
 #include <uitk/short_namespace.hpp>
 #include <smooth_lvgl.hpp>
 #include <array>
+#include <vector>
 #include <lvgl_image.h>
 #include <string_view>
 
@@ -31,6 +32,11 @@ enum class WsSignalSource {
     Remote,
 };
 
+enum class WsTextMessageMode {
+    Speech = 0,
+    DisplayCard,
+};
+
 /**
  * @brief
  *
@@ -38,6 +44,11 @@ enum class WsSignalSource {
 struct WsTextMessage_t {
     std::string name;
     std::string content;
+    WsTextMessageMode mode = WsTextMessageMode::Speech;
+    std::string title;
+    std::vector<std::string> lines;
+    std::string accent = "#FFDF9A";
+    uint32_t durationMs = 4000;
 };
 
 /**

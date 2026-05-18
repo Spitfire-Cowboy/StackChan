@@ -36,6 +36,7 @@ private:
     BleHandlerData_t _ble_motion_data;
 
     int _ws_call_view_id = -1;
+    int _ws_display_card_view_id = -1;
 
     uint32_t _last_motion_cmd_tick = 0;
 

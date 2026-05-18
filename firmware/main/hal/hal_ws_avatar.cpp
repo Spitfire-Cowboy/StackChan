@@ -291,11 +291,40 @@ public:
 
                         WsTextMessage_t text_msg;
 
+                        if (doc["type"].is<std::string>()) {
+                            auto type = doc["type"].as<std::string>();
+                            if (type == "displayCard" || type == "display_card") {
+                                text_msg.mode = WsTextMessageMode::DisplayCard;
+                            }
+                        }
+
                         if (doc["name"].is<std::string>()) {
                             text_msg.name = doc["name"].as<std::string>();
                         }
                         if (doc["content"].is<std::string>()) {
                             text_msg.content = doc["content"].as<std::string>();
+                        }
+                        if (doc["title"].is<std::string>()) {
+                            text_msg.title = doc["title"].as<std::string>();
+                        }
+                        if (doc["accent"].is<std::string>()) {
+                            text_msg.accent = doc["accent"].as<std::string>();
+                        }
+                        if (doc["durationMs"].is<uint32_t>()) {
+                            text_msg.durationMs = doc["durationMs"].as<uint32_t>();
+                        } else if (doc["timeoutMs"].is<uint32_t>()) {
+                            text_msg.durationMs = doc["timeoutMs"].as<uint32_t>();
+                        }
+                        if (doc["lines"].is<ArduinoJson::JsonArray>()) {
+                            for (auto line : doc["lines"].as<ArduinoJson::JsonArray>()) {
+                                if (line.is<std::string>()) {
+                                    text_msg.lines.push_back(line.as<std::string>());
+                                }
+                            }
+                        }
+                        if (text_msg.mode == WsTextMessageMode::DisplayCard && text_msg.lines.empty() &&
+                            !text_msg.content.empty()) {
+                            text_msg.lines.push_back(text_msg.content);
                         }
 
                         GetHAL().onWsTextMessage.emit(text_msg);

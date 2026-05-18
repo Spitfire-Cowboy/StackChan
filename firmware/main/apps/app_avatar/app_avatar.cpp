@@ -5,6 +5,7 @@
  */
 #include "app_avatar.h"
 #include "view/ws_call.h"
+#include "view/ws_display_card.h"
 #include <hal/hal.h>
 #include <mooncake.h>
 #include <mooncake_log.h>
@@ -12,6 +13,9 @@
 #include <smooth_lvgl.hpp>
 #include <stackchan/stackchan.h>
 #include <apps/common/common.h>
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
 #include <string_view>
 #include <cstdint>
 #include <memory>
@@ -40,6 +44,34 @@ static bool contains_word(const std::string& text, const std::unordered_set<std:
         }
     }
     return false;
+}
+
+static uint32_t parse_hex_color(std::string_view color, uint32_t fallback = 0xFFDF9A)
+{
+    if (color.empty()) {
+        return fallback;
+    }
+
+    std::string hex(color);
+    if (!hex.empty() && hex.front() == '#') {
+        hex.erase(0, 1);
+    }
+
+    if (hex.size() == 8) {
+        hex.erase(0, 2);
+    }
+
+    if (hex.size() != 6) {
+        return fallback;
+    }
+
+    char* end_ptr = nullptr;
+    auto parsed   = std::strtoul(hex.c_str(), &end_ptr, 16);
+    if (end_ptr == nullptr || *end_ptr != '\0') {
+        return fallback;
+    }
+
+    return static_cast<uint32_t>(parsed);
 }
 
 AppAvatar::AppAvatar()
@@ -190,6 +222,19 @@ void AppAvatar::onOpen()
 
         auto& stackchan = GetStackChan();
 
+        if (message.mode == WsTextMessageMode::DisplayCard) {
+            if (_ws_display_card_view_id >= 0) {
+                stackchan.avatar().removeDecorator(_ws_display_card_view_id);
+                _ws_display_card_view_id = -1;
+            }
+
+            auto view = std::make_unique<view::WsDisplayCardView>(lv_screen_active(), message.title, message.lines,
+                                                                  message.durationMs, parse_hex_color(message.accent));
+            view->onDestroy = [this]() { _ws_display_card_view_id = -1; };
+            _ws_display_card_view_id = stackchan.avatar().addDecorator(std::move(view));
+            return;
+        }
+
         stackchan.addModifier(
             std::make_unique<TimedSpeechModifier>(fmt::format("{} says: {}", message.name, message.content), 6000));
         stackchan.addModifier(std::make_unique<SpeakingModifier>(2000));
@@ -280,6 +325,10 @@ void AppAvatar::onClose()
         GetHAL().onWsCallEnd.clear();
         GetHAL().onWsTextMessage.clear();
         GetHAL().onWsDanceData.clear();
+
+        _ws_call_view_id         = -1;
+        _ws_display_card_view_id = -1;
+        _dance_modifier_id       = -1;
 
         view::destroy_home_indicator();
         view::destroy_status_bar();
