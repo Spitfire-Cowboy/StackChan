@@ -49,6 +49,8 @@ struct WsTextMessage_t {
     std::vector<std::string> lines;
     std::string accent = "#FFDF9A";
     uint32_t durationMs = 4000;
+    bool sticky = false;
+    bool clear  = false;
 };
 
 /**

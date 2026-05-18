@@ -297,6 +297,12 @@ public:
                                 text_msg.mode = WsTextMessageMode::DisplayCard;
                             }
                         }
+                        if (doc["action"].is<std::string>()) {
+                            auto action = doc["action"].as<std::string>();
+                            if (action == "clear" || action == "dismiss") {
+                                text_msg.clear = true;
+                            }
+                        }
 
                         if (doc["name"].is<std::string>()) {
                             text_msg.name = doc["name"].as<std::string>();
@@ -314,6 +320,12 @@ public:
                             text_msg.durationMs = doc["durationMs"].as<uint32_t>();
                         } else if (doc["timeoutMs"].is<uint32_t>()) {
                             text_msg.durationMs = doc["timeoutMs"].as<uint32_t>();
+                        }
+                        if (doc["sticky"].is<bool>()) {
+                            text_msg.sticky = doc["sticky"].as<bool>();
+                        }
+                        if (doc["clear"].is<bool>()) {
+                            text_msg.clear = doc["clear"].as<bool>();
                         }
                         if (doc["lines"].is<ArduinoJson::JsonArray>()) {
                             for (auto line : doc["lines"].as<ArduinoJson::JsonArray>()) {

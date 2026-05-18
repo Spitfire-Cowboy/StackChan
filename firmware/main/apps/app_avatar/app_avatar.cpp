@@ -228,8 +228,13 @@ void AppAvatar::onOpen()
                 _ws_display_card_view_id = -1;
             }
 
+            if (message.clear) {
+                return;
+            }
+
             auto view = std::make_unique<view::WsDisplayCardView>(lv_screen_active(), message.title, message.lines,
-                                                                  message.durationMs, parse_hex_color(message.accent));
+                                                                  message.durationMs, parse_hex_color(message.accent),
+                                                                  message.sticky);
             view->onDestroy = [this]() { _ws_display_card_view_id = -1; };
             _ws_display_card_view_id = stackchan.avatar().addDecorator(std::move(view));
             return;

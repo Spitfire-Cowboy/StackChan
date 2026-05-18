@@ -22,9 +22,10 @@ static std::string join_lines(const std::vector<std::string>& lines)
 }
 
 WsDisplayCardView::WsDisplayCardView(lv_obj_t* parent, std::string title, const std::vector<std::string>& lines,
-                                     uint32_t durationMs, uint32_t accentHex)
+                                     uint32_t durationMs, uint32_t accentHex, bool sticky)
 {
-    _durationMs = std::max<uint32_t>(durationMs, 1000);
+    _sticky     = sticky;
+    _durationMs = sticky ? 0 : std::max<uint32_t>(durationMs, 1000);
     _startTick  = GetHAL().millis();
 
     _panel = std::make_unique<uitk::lvgl_cpp::Container>(parent ? parent : lv_screen_active());
@@ -51,7 +52,7 @@ WsDisplayCardView::WsDisplayCardView(lv_obj_t* parent, std::string title, const 
     _title->align(LV_ALIGN_TOP_LEFT, 0, 0);
     _title->setWidth(260);
     _title->setText(title.empty() ? "STATUS" : title);
-    _title->setTextFont(&lv_font_montserrat_18);
+    _title->setTextFont(&lv_font_montserrat_20);
     _title->setTextColor(lv_color_hex(0x47330A));
 
     _content = std::make_unique<uitk::lvgl_cpp::Label>(_card->get());
@@ -73,7 +74,7 @@ WsDisplayCardView::~WsDisplayCardView()
 
 void WsDisplayCardView::_update()
 {
-    if (GetHAL().millis() - _startTick >= _durationMs) {
+    if (!_sticky && GetHAL().millis() - _startTick >= _durationMs) {
         requestDestroy();
     }
 }

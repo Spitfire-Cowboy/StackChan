@@ -20,7 +20,7 @@ public:
     std::function<void(void)> onDestroy;
 
     WsDisplayCardView(lv_obj_t* parent, std::string title, const std::vector<std::string>& lines, uint32_t durationMs,
-                      uint32_t accentHex = 0xFFDF9A);
+                      uint32_t accentHex = 0xFFDF9A, bool sticky = false);
 
     ~WsDisplayCardView() override;
 
@@ -34,6 +34,7 @@ private:
 
     uint32_t _startTick  = 0;
     uint32_t _durationMs = 4000;
+    bool _sticky         = false;
 };
 
 }  // namespace view
