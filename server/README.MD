@@ -226,10 +226,33 @@ Display card payload:
 }
 ```
 
+Sticky display card payload:
+
+```json
+{
+  "type": "displayCard",
+  "title": "ACTION REQUIRED",
+  "lines": ["Tap to Continue"],
+  "accent": "#FFD36A",
+  "sticky": true
+}
+```
+
+Clear display card payload:
+
+```json
+{
+  "type": "displayCard",
+  "clear": true
+}
+```
+
 Notes:
 - `content` still works for legacy speech messages.
 - `displayCard` accepts `content` as a single-line fallback if `lines` is omitted on the firmware side.
 - `accent` should be a 6-digit hex color string like `#FFDF9A`.
+- `sticky: true` keeps the card visible until it is explicitly cleared.
+- `clear: true` dismisses the current display card without requiring replacement lines.
 
 ### Go Helper Package
 
@@ -269,12 +292,95 @@ if err := web_socket.SendDisplayCard(
 }
 ```
 
+To post a sticky card:
+
+```go
+err := web_socket.SendDisplayCard(
+    ctx,
+    mac,
+    "ACTION REQUIRED",
+    []string{"Tap to Continue"},
+    "#FFD36A",
+    0,
+    true,
+    false,
+)
+```
+
+To clear the active card:
+
+```go
+err := web_socket.SendDisplayCard(ctx, mac, "", nil, "", 0, false, true)
+```
+
 For legacy speech bubbles:
 
 ```go
 packet, err := wsproto.CreateTextMessagePacket("Operator", "The equipment has been reconnected.")
 ```
 
+### HTTP Device Endpoint
+
+If you want to trigger a display card through the authenticated device API instead of calling the websocket helpers directly, use:
+
+```text
+POST /stackChan/v2/device/displayCard
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+Example request:
+
+```json
+{
+  "mac": "A1B2C3D4E5F6",
+  "title": "SYSTEM NOTICE",
+  "lines": ["Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"],
+  "accent": "#FFDF9A",
+  "timeoutMs": 4000
+}
+```
+
+Sticky request:
+
+```json
+{
+  "mac": "A1B2C3D4E5F6",
+  "title": "ACTION REQUIRED",
+  "lines": ["Tap to Continue"],
+  "accent": "#FFD36A",
+  "sticky": true
+}
+```
+
+Clear request:
+
+```json
+{
+  "mac": "A1B2C3D4E5F6",
+  "clear": true
+}
+```
+
+Example `curl`:
+
+```bash
+curl -X POST http://127.0.0.1:12800/stackChan/v2/device/displayCard \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mac": "A1B2C3D4E5F6",
+    "title": "SYSTEM NOTICE",
+    "lines": ["Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"],
+    "accent": "#FFDF9A",
+    "timeoutMs": 4000
+  }'
+```
+
+The endpoint only succeeds when:
+- the device is bound to the authenticated user
+- the StackChan is currently connected to the websocket server
+- at least one non-empty display card line is provided unless `clear` is true
 ---
 
 ## Project Structure
