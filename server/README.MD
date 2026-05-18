@@ -166,6 +166,7 @@ The server provides RESTful APIs organized by module:
 - `POST /device/unbind` - Unbind a device from the current user
 - `PUT /device/update` - Update device information
 - `GET /devices` - Get list of devices
+- `POST /device/displayCard` - Send a temporary display card to a connected bound device
 
 ### User APIs (`/api/user/*`)
 - `POST /user/login` - User login
@@ -270,6 +271,48 @@ For legacy speech bubbles:
 ```go
 packet, err := wsproto.CreateTextMessagePacket("Operator", "The equipment has been reconnected.")
 ```
+
+### HTTP Device Endpoint
+
+If you want to trigger a display card through the authenticated device API instead of calling the websocket helpers directly, use:
+
+```text
+POST /stackChan/v2/device/displayCard
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+Example request:
+
+```json
+{
+  "mac": "A1B2C3D4E5F6",
+  "title": "SHIP RECEIPTS",
+  "lines": ["Pro777", "Score 57", "Streak 3d", "ITHACA 42%"],
+  "accent": "#FFDF9A",
+  "timeoutMs": 4000
+}
+```
+
+Example `curl`:
+
+```bash
+curl -X POST http://127.0.0.1:12800/stackChan/v2/device/displayCard \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mac": "A1B2C3D4E5F6",
+    "title": "SHIP RECEIPTS",
+    "lines": ["Pro777", "Score 57", "Streak 3d", "ITHACA 42%"],
+    "accent": "#FFDF9A",
+    "timeoutMs": 4000
+  }'
+```
+
+The endpoint only succeeds when:
+- the device is bound to the authenticated user
+- the StackChan is currently connected to the websocket server
+- at least one non-empty display card line is provided
 
 ---
 
