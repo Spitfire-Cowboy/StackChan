@@ -68,10 +68,9 @@ func waitForClosedChannel(t *testing.T, ch chan *WsSendMsg) {
 			if !ok {
 				return
 			}
+			// Channel yielded a value before close; keep waiting for closure.
 		case <-deadline:
 			t.Fatal("timed out waiting for writer coroutine to close channel")
-		default:
-			time.Sleep(10 * time.Millisecond)
 		}
 	}
 }

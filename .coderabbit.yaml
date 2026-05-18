@@ -14,15 +14,15 @@ reviews:
   poem: false
   review_status: true
   collapse_walkthrough: false
+  path_instructions:
+    - path: "firmware/**"
+      instructions: |
+        This repo contains embedded firmware, app, server, and remote-control code. For firmware changes, prioritize memory usage, build reproducibility, hardware safety, transport compatibility, and regressions in BLE/Wi-Fi control paths.
+    - path: "server/**"
+      instructions: |
+        For server changes, prioritize request/response correctness, configuration safety, auth handling, and whether new code remains testable without requiring a live database.
+    - path: "app/**"
+      instructions: |
+        For Flutter app changes, prioritize BLE/device-control correctness, platform compatibility, analyzer cleanliness, and avoiding generated-file churn in reviews.
 chat:
   auto_reply: true
-path_instructions:
-  - path: "firmware/**"
-    instructions: |
-      This repo contains embedded firmware, app, server, and remote-control code. For firmware changes, prioritize memory usage, build reproducibility, hardware safety, transport compatibility, and regressions in BLE/Wi-Fi control paths.
-  - path: "server/**"
-    instructions: |
-      For server changes, prioritize request/response correctness, configuration safety, auth handling, and whether new code remains testable without requiring a live database.
-  - path: "app/**"
-    instructions: |
-      For Flutter app changes, prioritize BLE/device-control correctness, platform compatibility, analyzer cleanliness, and avoiding generated-file churn in reviews.
