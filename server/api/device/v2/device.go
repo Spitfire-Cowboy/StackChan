@@ -49,12 +49,14 @@ type AgentRestoreDefaultReq struct {
 type AgentRestoreDefaultRes bool
 
 type SendDisplayCardReq struct {
-	g.Meta    `path:"/device/displayCard" method:"post" tags:"Device" summary:"Send a temporary display card to a connected bound device"`
+	g.Meta    `path:"/device/displayCard" method:"post" tags:"Device" summary:"Send or clear a display card on a connected bound device"`
 	Mac       string   `json:"mac" v:"required" dc:"Device MAC address"`
 	Title     string   `json:"title" dc:"Display card title"`
 	Lines     []string `json:"lines" dc:"Display card lines"`
 	Accent    string   `json:"accent" dc:"Display card accent color as #RRGGBB"`
 	TimeoutMs uint32   `json:"timeoutMs" dc:"Display duration in milliseconds"`
+	Sticky    bool     `json:"sticky" dc:"Keep the display card visible until explicitly cleared"`
+	Clear     bool     `json:"clear" dc:"Clear the current display card instead of showing a new one"`
 }
 
 type SendDisplayCardRes bool

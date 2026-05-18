@@ -24,8 +24,8 @@ func SendSpeechMessage(ctx context.Context, mac, name, content string) error {
 	return nil
 }
 
-func SendDisplayCard(ctx context.Context, mac, title string, lines []string, accent string, timeoutMs uint32) error {
-	packet, err := wsproto.CreateDisplayCardPacket(title, lines, accent, timeoutMs)
+func SendDisplayCard(ctx context.Context, mac, title string, lines []string, accent string, timeoutMs uint32, sticky bool, clear bool) error {
+	packet, err := wsproto.CreateDisplayCardPacket(title, lines, accent, timeoutMs, sticky, clear)
 	if err != nil {
 		return err
 	}
