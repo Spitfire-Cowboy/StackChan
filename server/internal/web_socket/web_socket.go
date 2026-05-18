@@ -810,6 +810,11 @@ func SendStackChanMessage(ctx context.Context, mac string, messageType *int, msg
 	}
 }
 
+func IsStackChanOnline(mac string) bool {
+	stackChanClient := getStackChanClient(mac)
+	return stackChanClient != nil && stackChanClient.GetConn() != nil
+}
+
 // Encapsulate binary messages for custom protocol (type + data length + data)
 func createMessage(msgType byte, data []byte) *[]byte {
 	var dataLen int
