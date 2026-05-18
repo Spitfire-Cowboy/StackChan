@@ -250,6 +250,21 @@ messageType := websocket.BinaryMessage
 web_socket.SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
 ```
 
+If you are already in the websocket server layer, use the convenience wrappers in `server/internal/web_socket`:
+
+```go
+if err := web_socket.SendDisplayCard(
+    ctx,
+    mac,
+    "SHIP RECEIPTS",
+    []string{"Pro777", "Score 57", "Streak 3d", "ITHACA 42%"},
+    "#FFDF9A",
+    4000,
+); err != nil {
+    return err
+}
+```
+
 For legacy speech bubbles:
 
 ```go
