@@ -26,13 +26,13 @@ func TestBuildDisplayCardPayloadDefaults(t *testing.T) {
 
 func TestBuildDisplayCardPayloadNormalizesLines(t *testing.T) {
 	payload := buildDisplayCardPayload(
-		"  SHIP RECEIPTS  ",
-		[]string{"  Pro777  ", "", " Score 57 ", " ", "Streak 3d"},
+		"  SYSTEM NOTICE  ",
+		[]string{"  Wi-Fi Connected  ", "", " Battery 82% ", " ", "Camera Ready"},
 		"  #123456  ",
 		9000,
 	)
 
-	if payload.title != "SHIP RECEIPTS" {
+	if payload.title != "SYSTEM NOTICE" {
 		t.Fatalf("expected trimmed title, got %q", payload.title)
 	}
 	if payload.accent != "#123456" {
@@ -44,7 +44,7 @@ func TestBuildDisplayCardPayloadNormalizesLines(t *testing.T) {
 	if len(payload.lines) != 3 {
 		t.Fatalf("expected 3 lines, got %#v", payload.lines)
 	}
-	if payload.lines[0] != "Pro777" || payload.lines[1] != "Score 57" || payload.lines[2] != "Streak 3d" {
+	if payload.lines[0] != "Wi-Fi Connected" || payload.lines[1] != "Battery 82%" || payload.lines[2] != "Camera Ready" {
 		t.Fatalf("unexpected lines: %#v", payload.lines)
 	}
 }

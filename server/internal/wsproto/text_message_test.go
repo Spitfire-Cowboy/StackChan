@@ -35,7 +35,7 @@ func decodeTextMessagePacket(t *testing.T, packet []byte) TextMessagePayload {
 }
 
 func TestCreateTextMessagePacket(t *testing.T) {
-	packet, err := CreateTextMessagePacket("Pro777", "Ship it.")
+	packet, err := CreateTextMessagePacket("Operator", "System online.")
 	if err != nil {
 		t.Fatalf("CreateTextMessagePacket returned error: %v", err)
 	}
@@ -44,11 +44,11 @@ func TestCreateTextMessagePacket(t *testing.T) {
 	if payload.Type != "" {
 		t.Fatalf("expected empty type for legacy speech packet, got %q", payload.Type)
 	}
-	if payload.Name != "Pro777" {
-		t.Fatalf("expected name Pro777, got %q", payload.Name)
+	if payload.Name != "Operator" {
+		t.Fatalf("expected name Operator, got %q", payload.Name)
 	}
-	if payload.Content != "Ship it." {
-		t.Fatalf("expected content %q, got %q", "Ship it.", payload.Content)
+	if payload.Content != "System online." {
+		t.Fatalf("expected content %q, got %q", "System online.", payload.Content)
 	}
 	if payload.Title != "" || len(payload.Lines) != 0 || payload.Accent != "" || payload.TimeoutMs != 0 {
 		t.Fatalf("expected speech payload fields to stay unset, got %#v", payload)
@@ -56,7 +56,7 @@ func TestCreateTextMessagePacket(t *testing.T) {
 }
 
 func TestCreateDisplayCardPacket(t *testing.T) {
-	packet, err := CreateDisplayCardPacket("SHIP RECEIPTS", []string{"Pro777", "Streak 3d"}, "#123456", 9000)
+	packet, err := CreateDisplayCardPacket("SYSTEM NOTICE", []string{"Wi-Fi Connected", "Battery 82%"}, "#123456", 9000)
 	if err != nil {
 		t.Fatalf("CreateDisplayCardPacket returned error: %v", err)
 	}
@@ -65,10 +65,10 @@ func TestCreateDisplayCardPacket(t *testing.T) {
 	if payload.Type != "displayCard" {
 		t.Fatalf("expected displayCard type, got %q", payload.Type)
 	}
-	if payload.Title != "SHIP RECEIPTS" {
-		t.Fatalf("expected title %q, got %q", "SHIP RECEIPTS", payload.Title)
+	if payload.Title != "SYSTEM NOTICE" {
+		t.Fatalf("expected title %q, got %q", "SYSTEM NOTICE", payload.Title)
 	}
-	if len(payload.Lines) != 2 || payload.Lines[0] != "Pro777" || payload.Lines[1] != "Streak 3d" {
+	if len(payload.Lines) != 2 || payload.Lines[0] != "Wi-Fi Connected" || payload.Lines[1] != "Battery 82%" {
 		t.Fatalf("unexpected lines: %#v", payload.Lines)
 	}
 	if payload.Accent != "#123456" {

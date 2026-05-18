@@ -220,8 +220,8 @@ Display card payload:
 ```json
 {
   "type": "displayCard",
-  "title": "SHIP RECEIPTS",
-  "lines": ["Pro777", "Score 57", "Streak 3d", "ITHACA 42%"],
+  "title": "SYSTEM NOTICE",
+  "lines": ["Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"],
   "accent": "#FFDF9A",
   "timeoutMs": 4000
 }
@@ -238,8 +238,8 @@ Use the typed helpers in `server/internal/wsproto` instead of hand-building the 
 
 ```go
 packet, err := wsproto.CreateDisplayCardPacket(
-    "SHIP RECEIPTS",
-    []string{"Pro777", "Score 57", "Streak 3d", "ITHACA 42%"},
+    "SYSTEM NOTICE",
+    []string{"Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"},
     "#FFDF9A",
     4000,
 )
@@ -257,8 +257,8 @@ If you are already in the websocket server layer, use the convenience wrappers i
 if err := web_socket.SendDisplayCard(
     ctx,
     mac,
-    "SHIP RECEIPTS",
-    []string{"Pro777", "Score 57", "Streak 3d", "ITHACA 42%"},
+    "SYSTEM NOTICE",
+    []string{"Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"},
     "#FFDF9A",
     4000,
 ); err != nil {
@@ -287,8 +287,8 @@ Example request:
 ```json
 {
   "mac": "A1B2C3D4E5F6",
-  "title": "SHIP RECEIPTS",
-  "lines": ["Pro777", "Score 57", "Streak 3d", "ITHACA 42%"],
+  "title": "SYSTEM NOTICE",
+  "lines": ["Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"],
   "accent": "#FFDF9A",
   "timeoutMs": 4000
 }
@@ -302,8 +302,8 @@ curl -X POST http://127.0.0.1:12800/stackChan/v2/device/displayCard \
   -H "Content-Type: application/json" \
   -d '{
     "mac": "A1B2C3D4E5F6",
-    "title": "SHIP RECEIPTS",
-    "lines": ["Pro777", "Score 57", "Streak 3d", "ITHACA 42%"],
+    "title": "SYSTEM NOTICE",
+    "lines": ["Wi-Fi Connected", "Battery 82%", "Camera Ready", "Tap to Continue"],
     "accent": "#FFDF9A",
     "timeoutMs": 4000
   }'
