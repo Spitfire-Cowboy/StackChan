@@ -8,8 +8,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
-
 //Assume theseisYoucustomDepends on(according toActual situationAdjust)
 import '../app_state.dart';
 import '../model/msg_type.dart';
@@ -76,7 +74,6 @@ class WebSocketUtil {
 
       //connectsuccesslog(ContainstimeandURL)
       _isConnected = true;
-      final connectTime = DateTime.now().toString().split('.').first;
                   
       _subscription = _socket!.listen(
         _handleMessage,
@@ -91,7 +88,6 @@ class WebSocketUtil {
     } catch (e) {
       _isConnected = false;
       //connectfaillog(ContainsSpecificerrorinfo)
-      final errorTime = DateTime.now().toString().split('.').first;
                         _scheduleReconnect();
     }
   }
@@ -115,7 +111,6 @@ class WebSocketUtil {
   void _handleDone() {
     //connectcloselog(ContainscloseoriginalBecause)
     _isConnected = false;
-    final closeTime = DateTime.now().toString().split('.').first;
                 _scheduleReconnect();
   }
 

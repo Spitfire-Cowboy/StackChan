@@ -5,7 +5,6 @@ SPDX-License-Identifier: MIT
 
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 class NativeBridge {
@@ -95,7 +94,8 @@ class NativeBridge {
     try {
       await _audioPlayChannel.send(pcmData);
     } catch (e) {
-          }
+      // Ignore playback channel failures in fire-and-forget mode.
+    }
   }
 }
 
