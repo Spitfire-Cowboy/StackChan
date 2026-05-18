@@ -25,6 +25,7 @@
 - [Installation](#installation)
 - [Running the Server](#running-the-server)
 - [API Documentation](#api-documentation)
+- [WebSocket Display Cards](#websocket-display-cards)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [License](#license)
@@ -184,6 +185,76 @@ The server provides RESTful APIs organized by module:
 ### Admin APIs (`/api/admin/*`)
 - App management operations
 - User management
+
+---
+
+## WebSocket Display Cards
+
+The StackChan websocket binary protocol already uses `TextMessage` packets (`0x07`) for remote speech messages.
+This repo now also supports a structured `displayCard` payload on that same transport for temporary on-device status cards in the avatar app.
+
+### Packet Framing
+
+Binary websocket packets are framed as:
+
+```text
+[type:1 byte][length:4 bytes big-endian][payload:length bytes]
+```
+
+For text messages and display cards, `type` is `0x07`.
+
+### Payload Shapes
+
+Legacy speech payload:
+
+```json
+{
+  "name": "Operator",
+  "content": "The equipment has been reconnected."
+}
+```
+
+Display card payload:
+
+```json
+{
+  "type": "displayCard",
+  "title": "SHIP RECEIPTS",
+  "lines": ["Pro777", "Score 57", "Streak 3d", "ITHACA 42%"],
+  "accent": "#FFDF9A",
+  "timeoutMs": 4000
+}
+```
+
+Notes:
+- `content` still works for legacy speech messages.
+- `displayCard` accepts `content` as a single-line fallback if `lines` is omitted on the firmware side.
+- `accent` should be a 6-digit hex color string like `#FFDF9A`.
+
+### Go Helper Package
+
+Use the typed helpers in `server/internal/wsproto` instead of hand-building the JSON and binary framing:
+
+```go
+packet, err := wsproto.CreateDisplayCardPacket(
+    "SHIP RECEIPTS",
+    []string{"Pro777", "Score 57", "Streak 3d", "ITHACA 42%"},
+    "#FFDF9A",
+    4000,
+)
+if err != nil {
+    return err
+}
+
+messageType := websocket.BinaryMessage
+web_socket.SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
+```
+
+For legacy speech bubbles:
+
+```go
+packet, err := wsproto.CreateTextMessagePacket("Operator", "The equipment has been reconnected.")
+```
 
 ---
 
