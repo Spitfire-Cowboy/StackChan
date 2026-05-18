@@ -1,2 +1,11 @@
 .DS_Store
 .idea/
+
+# Go coverage artefacts
+server/coverage.out
+
+# Flutter and native build artefacts
+app/.dart_tool/
+app/.flutter-plugins-dependencies
+app/build/
+app/coverage/

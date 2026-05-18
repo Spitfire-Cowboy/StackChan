@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  server-tests:
+    name: Server tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+
+      - name: Run Go vet
+        run: go vet ./internal/model/...
+
+      - name: Run Staticcheck
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+          "$(go env GOPATH)/bin/staticcheck" ./internal/model/...
+
+      - name: Run Go tests with coverage
+        run: go test -covermode=atomic -coverprofile=coverage.out ./internal/model/...
+
+      - name: Upload server coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./server/coverage.out
+          flags: server
+          name: server
+          fail_ci_if_error: true
+          use_oidc: true
+
+  app-tests:
+    name: App tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build pkg-config libgtk-3-dev liblzma-dev clang
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run focused Flutter analysis
+        run: flutter analyze lib/model/expression_data.dart lib/util/mac_address_validator.dart test/model/expression_data_test.dart test/util/mac_address_validator_test.dart
+
+      - name: Run Flutter tests with coverage
+        run: flutter test --coverage test/model/expression_data_test.dart test/util/mac_address_validator_test.dart
+
+      - name: Upload app coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./app/coverage/lcov.info
+          flags: app
+          name: app
+          fail_ci_if_error: true
+          use_oidc: true
