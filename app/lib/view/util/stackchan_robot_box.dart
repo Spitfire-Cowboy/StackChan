@@ -416,13 +416,11 @@ class _StackchanRobotThreeState extends State<StackchanRobotJs> {
     final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
 
     if (byteData != null) {
-      //convertas three_js Uint8Array
       final uint8List = byteData.buffer.asUint8List();
-      final nativeArray = three.Uint8Array.fromList(uint8List);
 
       //updatetexture
       expressionTexture!.image = three.ImageElement(
-        data: nativeArray,
+        data: uint8List,
         width: canvasWidth.toInt(),
         height: canvasHeight.toInt(),
       );
@@ -451,7 +449,6 @@ class _StackchanRobotThreeState extends State<StackchanRobotJs> {
       return three.Color(1, 1, 1);
     }
     final intValue = int.parse(hex, radix: 16);
-    final int a = (intValue >> 24) & 0xFF;
     final int r = (intValue >> 16) & 0xFF;
     final int g = (intValue >> 8) & 0xFF;
     final int b = intValue & 0xFF;
