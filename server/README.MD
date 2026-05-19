@@ -295,22 +295,19 @@ if err := web_socket.SendDisplayCard(
 To post a sticky card:
 
 ```go
-err := web_socket.SendDisplayCard(
+err := web_socket.SendStickyDisplayCard(
     ctx,
     mac,
     "ACTION REQUIRED",
     []string{"Tap to Continue"},
     "#FFD36A",
-    0,
-    true,
-    false,
 )
 ```
 
 To clear the active card:
 
 ```go
-err := web_socket.SendDisplayCard(ctx, mac, "", nil, "", 0, false, true)
+err := web_socket.ClearDisplayCard(ctx, mac)
 ```
 
 For legacy speech bubbles:
