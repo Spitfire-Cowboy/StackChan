@@ -552,6 +552,26 @@ public:
         return &backlight;
     }
 
+    void SetManualPowerSaveMode(bool enabled)
+    {
+        if (enabled) {
+            GetDisplay()->SetPowerSaveMode(true);
+            GetBacklight()->SetBrightness(10);
+            return;
+        }
+
+        GetDisplay()->SetPowerSaveMode(false);
+        GetBacklight()->RestoreBrightness();
+        if (power_save_timer_ != nullptr) {
+            power_save_timer_->WakeUp();
+        }
+    }
+
+    void PowerOffNow()
+    {
+        pmic_->PowerOff();
+    }
+
     i2c_master_bus_handle_t GetI2cBus()
     {
         return i2c_bus_;
@@ -648,6 +668,18 @@ uint8_t hal_bridge::board_get_speaker_volume()
         volume = 10;
     }
     return volume;
+}
+
+void hal_bridge::board_set_power_save_mode(bool enabled)
+{
+    auto& board = (M5StackCoreS3Board&)Board::GetInstance();
+    board.SetManualPowerSaveMode(enabled);
+}
+
+void hal_bridge::board_power_off()
+{
+    auto& board = (M5StackCoreS3Board&)Board::GetInstance();
+    board.PowerOffNow();
 }
 
 void hal_bridge::toggle_xiaozhi_chat_state()
