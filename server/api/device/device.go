@@ -31,4 +31,5 @@ type IDeviceV2 interface {
 	UpdateDevice(ctx context.Context, req *v2.UpdateDeviceReq) (res *v2.UpdateDeviceRes, err error)
 	AgentRestoreDefault(ctx context.Context, req *v2.AgentRestoreDefaultReq) (res *v2.AgentRestoreDefaultRes, err error)
 	SendDisplayCard(ctx context.Context, req *v2.SendDisplayCardReq) (res *v2.SendDisplayCardRes, err error)
+	SendDeviceControl(ctx context.Context, req *v2.SendDeviceControlReq) (res *v2.SendDeviceControlRes, err error)
 }
