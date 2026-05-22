@@ -56,3 +56,26 @@ func ClearDisplayCard(ctx context.Context, mac string) error {
 	SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
 	return nil
 }
+
+func SendDeviceControl(ctx context.Context, mac string, action wsproto.DeviceControlAction) error {
+	packet, err := wsproto.CreateDeviceControlPacket(action)
+	if err != nil {
+		return err
+	}
+
+	messageType := websocket.BinaryMessage
+	SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
+	return nil
+}
+
+func SendSleep(ctx context.Context, mac string) error {
+	return SendDeviceControl(ctx, mac, wsproto.DeviceControlActionSleep)
+}
+
+func SendWake(ctx context.Context, mac string) error {
+	return SendDeviceControl(ctx, mac, wsproto.DeviceControlActionWake)
+}
+
+func SendPowerOff(ctx context.Context, mac string) error {
+	return SendDeviceControl(ctx, mac, wsproto.DeviceControlActionPowerOff)
+}

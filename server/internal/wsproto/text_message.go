@@ -62,7 +62,7 @@ func CreateClearDisplayCardPacket() ([]byte, error) {
 	return CreateDisplayCardPacket("", nil, "", 0, false, true)
 }
 
-func createTextMessagePacket(payload TextMessagePayload) ([]byte, error) {
+func createTextMessagePacket(payload any) ([]byte, error) {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
