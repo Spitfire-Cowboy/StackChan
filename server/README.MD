@@ -192,6 +192,7 @@ The server provides RESTful APIs organized by module:
 
 The StackChan websocket binary protocol already uses `TextMessage` packets (`0x07`) for remote speech messages.
 This repo now also supports a structured `displayCard` payload on that same transport for temporary on-device status cards in the avatar app.
+It also supports a structured `deviceControl` payload for generic remote sleep, wake, and power-off actions.
 
 ### Packet Framing
 
@@ -226,10 +227,20 @@ Display card payload:
 }
 ```
 
+Device control payload:
+
+```json
+{
+  "type": "deviceControl",
+  "action": "sleep"
+}
+```
+
 Notes:
 - `content` still works for legacy speech messages.
 - `displayCard` accepts `content` as a single-line fallback if `lines` is omitted on the firmware side.
 - `accent` should be a 6-digit hex color string like `#FFDF9A`.
+- `deviceControl.action` currently supports `sleep`, `wake`, and `powerOff`.
 
 ### Go Helper Package
 
@@ -274,6 +285,41 @@ For legacy speech bubbles:
 ```go
 packet, err := wsproto.CreateTextMessagePacket("Operator", "The equipment has been reconnected.")
 ```
+
+For generic device controls:
+
+```go
+packet, err := wsproto.CreateDeviceControlPacket(wsproto.DeviceControlActionSleep)
+```
+
+Or use the websocket convenience wrappers:
+
+```go
+if err := web_socket.SendSleep(ctx, mac); err != nil {
+    return err
+}
+```
+
+### Device Control Endpoint
+
+If you are calling from an authenticated API client instead of server-side Go code, use the v2 device control endpoint:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/device/control \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <token>' \
+  -d '{
+    "mac": "AA:BB:CC:DD:EE:FF",
+    "action": "wake"
+  }'
+```
+
+Accepted actions:
+- `sleep`
+- `wake`
+- `powerOff`
+- `power_off`
+- `shutdown`
 
 ---
 
