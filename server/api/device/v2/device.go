@@ -60,3 +60,11 @@ type SendDisplayCardReq struct {
 }
 
 type SendDisplayCardRes bool
+
+type SendDeviceControlReq struct {
+	g.Meta `path:"/device/control" method:"post" tags:"Device" summary:"Send a device control action to a connected bound device"`
+	Mac    string `json:"mac" v:"required" dc:"Device MAC address"`
+	Action string `json:"action" v:"required" dc:"Device control action: sleep, wake, or powerOff"`
+}
+
+type SendDeviceControlRes bool
