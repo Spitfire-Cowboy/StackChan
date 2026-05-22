@@ -115,6 +115,27 @@ func TestCreateDisplayCardPacketSticky(t *testing.T) {
 	}
 }
 
+func TestCreateStickyDisplayCardPacket(t *testing.T) {
+	packet, err := CreateStickyDisplayCardPacket("ACTION REQUIRED", []string{"Tap to continue"}, "#FFD36A")
+	if err != nil {
+		t.Fatalf("CreateStickyDisplayCardPacket returned error: %v", err)
+	}
+
+	payload := decodeTextMessagePacket(t, packet)
+	if !payload.Sticky || payload.Clear {
+		t.Fatalf("expected sticky non-clear payload, got %#v", payload)
+	}
+	if payload.Title != "ACTION REQUIRED" {
+		t.Fatalf("expected title ACTION REQUIRED, got %q", payload.Title)
+	}
+	if len(payload.Lines) != 1 || payload.Lines[0] != "Tap to continue" {
+		t.Fatalf("unexpected lines: %#v", payload.Lines)
+	}
+	if payload.Accent != "#FFD36A" {
+		t.Fatalf("expected accent #FFD36A, got %q", payload.Accent)
+	}
+}
+
 func TestCreateDisplayCardPacketClear(t *testing.T) {
 	packet, err := CreateDisplayCardPacket("STATUS", nil, "", 0, false, true)
 	if err != nil {
@@ -124,6 +145,24 @@ func TestCreateDisplayCardPacketClear(t *testing.T) {
 	payload := decodeTextMessagePacket(t, packet)
 	if !payload.Clear {
 		t.Fatalf("expected clear payload, got %#v", payload)
+	}
+	if payload.TimeoutMs != 0 {
+		t.Fatalf("expected clear payload timeout to remain 0, got %d", payload.TimeoutMs)
+	}
+}
+
+func TestCreateClearDisplayCardPacket(t *testing.T) {
+	packet, err := CreateClearDisplayCardPacket()
+	if err != nil {
+		t.Fatalf("CreateClearDisplayCardPacket returned error: %v", err)
+	}
+
+	payload := decodeTextMessagePacket(t, packet)
+	if !payload.Clear || payload.Sticky {
+		t.Fatalf("expected clear non-sticky payload, got %#v", payload)
+	}
+	if payload.Title != "" {
+		t.Fatalf("expected empty title, got %q", payload.Title)
 	}
 	if payload.TimeoutMs != 0 {
 		t.Fatalf("expected clear payload timeout to remain 0, got %d", payload.TimeoutMs)

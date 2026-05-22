@@ -54,6 +54,14 @@ func CreateDisplayCardPacket(title string, lines []string, accent string, timeou
 	})
 }
 
+func CreateStickyDisplayCardPacket(title string, lines []string, accent string) ([]byte, error) {
+	return CreateDisplayCardPacket(title, lines, accent, 0, true, false)
+}
+
+func CreateClearDisplayCardPacket() ([]byte, error) {
+	return CreateDisplayCardPacket("", nil, "", 0, false, true)
+}
+
 func createTextMessagePacket(payload TextMessagePayload) ([]byte, error) {
 	body, err := json.Marshal(payload)
 	if err != nil {

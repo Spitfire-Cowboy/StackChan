@@ -34,3 +34,25 @@ func SendDisplayCard(ctx context.Context, mac, title string, lines []string, acc
 	SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
 	return nil
 }
+
+func SendStickyDisplayCard(ctx context.Context, mac, title string, lines []string, accent string) error {
+	packet, err := wsproto.CreateStickyDisplayCardPacket(title, lines, accent)
+	if err != nil {
+		return err
+	}
+
+	messageType := websocket.BinaryMessage
+	SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
+	return nil
+}
+
+func ClearDisplayCard(ctx context.Context, mac string) error {
+	packet, err := wsproto.CreateClearDisplayCardPacket()
+	if err != nil {
+		return err
+	}
+
+	messageType := websocket.BinaryMessage
+	SendStackChanMessage(ctx, mac, &messageType, &packet, nil)
+	return nil
+}
