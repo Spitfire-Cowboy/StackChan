@@ -39,12 +39,12 @@ func (c *ControllerV2) SendDisplayCard(ctx context.Context, req *v2.SendDisplayC
 		return nil, gerror.NewCode(gcode.CodeBusinessValidationFailed, "device is offline")
 	}
 
-	payload := buildDisplayCardPayload(req.Title, req.Lines, req.Accent, req.TimeoutMs)
-	if len(payload.lines) == 0 {
+	payload := buildDisplayCardPayload(req.Title, req.Lines, req.Accent, req.TimeoutMs, req.Sticky, req.Clear)
+	if !payload.clear && len(payload.lines) == 0 {
 		return nil, gerror.NewCode(gcode.CodeMissingParameter, "at least one non-empty display card line is required")
 	}
 
-	if err := web_socket.SendDisplayCard(ctx, req.Mac, payload.title, payload.lines, payload.accent, payload.timeoutMs); err != nil {
+	if err := web_socket.SendDisplayCard(ctx, req.Mac, payload.title, payload.lines, payload.accent, payload.timeoutMs, payload.sticky, payload.clear); err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "failed to send display card")
 	}
 

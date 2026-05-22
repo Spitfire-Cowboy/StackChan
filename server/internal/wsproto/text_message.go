@@ -24,6 +24,8 @@ type TextMessagePayload struct {
 	Lines     []string `json:"lines,omitempty"`
 	Accent    string   `json:"accent,omitempty"`
 	TimeoutMs uint32   `json:"timeoutMs,omitempty"`
+	Sticky    bool     `json:"sticky,omitempty"`
+	Clear     bool     `json:"clear,omitempty"`
 }
 
 func CreateTextMessagePacket(name, content string) ([]byte, error) {
@@ -33,11 +35,11 @@ func CreateTextMessagePacket(name, content string) ([]byte, error) {
 	})
 }
 
-func CreateDisplayCardPacket(title string, lines []string, accent string, timeoutMs uint32) ([]byte, error) {
+func CreateDisplayCardPacket(title string, lines []string, accent string, timeoutMs uint32, sticky bool, clear bool) ([]byte, error) {
 	if accent == "" {
 		accent = defaultDisplayCardAccent
 	}
-	if timeoutMs == 0 {
+	if timeoutMs == 0 && !sticky && !clear {
 		timeoutMs = defaultDisplayCardTimeoutMs
 	}
 
@@ -47,6 +49,8 @@ func CreateDisplayCardPacket(title string, lines []string, accent string, timeou
 		Lines:     append([]string(nil), lines...),
 		Accent:    accent,
 		TimeoutMs: timeoutMs,
+		Sticky:    sticky,
+		Clear:     clear,
 	})
 }
 

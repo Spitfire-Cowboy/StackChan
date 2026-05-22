@@ -19,9 +19,11 @@ type displayCardPayload struct {
 	lines     []string
 	accent    string
 	timeoutMs uint32
+	sticky    bool
+	clear     bool
 }
 
-func buildDisplayCardPayload(title string, lines []string, accent string, timeoutMs uint32) displayCardPayload {
+func buildDisplayCardPayload(title string, lines []string, accent string, timeoutMs uint32, sticky bool, clear bool) displayCardPayload {
 	normalizedTitle := strings.TrimSpace(title)
 	if normalizedTitle == "" {
 		normalizedTitle = defaultDisplayCardTitle
@@ -44,7 +46,7 @@ func buildDisplayCardPayload(title string, lines []string, accent string, timeou
 		normalizedAccent = defaultDisplayCardAccent
 	}
 
-	if timeoutMs == 0 {
+	if timeoutMs == 0 && !sticky && !clear {
 		timeoutMs = defaultDisplayCardTimeout
 	}
 
@@ -53,5 +55,7 @@ func buildDisplayCardPayload(title string, lines []string, accent string, timeou
 		lines:     normalizedLines,
 		accent:    normalizedAccent,
 		timeoutMs: timeoutMs,
+		sticky:    sticky,
+		clear:     clear,
 	}
 }
