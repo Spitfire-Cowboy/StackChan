@@ -489,20 +489,20 @@ func readAppClientMessage(ctx context.Context, client *model.AppClient, messageT
 		switch msgType {
 		case pong:
 			break
-		case GetDeviceName:
-			// Query device name
-			name, err := service.GetDeviceName(ctx, client.GetMac())
-			if err != nil {
-				logger.Errorf(ctx, err.Error())
-				return
-			}
+			case GetDeviceName:
+				// Query device name
+				name, err := service.GetDeviceName(ctx, client.GetMac())
+				if err != nil {
+					logger.Errorf(ctx, "GetDeviceName failed: %v", err)
+					return
+				}
 			if name == "" {
 				logger.Infof(ctx, "Queried device nickname is empty")
 				return
-			}
-			newMsg := createStringMessage(GetDeviceName, name)
-			logger.Infof(ctx, "Device name found, returning: "+name)
-			appSendMessage(ctx, client, messageType, newMsg)
+				}
+				newMsg := createStringMessage(GetDeviceName, name)
+				logger.Infof(ctx, "Device name found, returning: %s", name)
+				appSendMessage(ctx, client, messageType, newMsg)
 			break
 		case UpdateDeviceName:
 			stackChanClient := getStackChanClient(client.GetMac())
@@ -808,6 +808,11 @@ func SendStackChanMessage(ctx context.Context, mac string, messageType *int, msg
 	if stackChanClient != nil {
 		stackChanSendMessage(ctx, stackChanClient, messageType, msg)
 	}
+}
+
+func IsStackChanOnline(mac string) bool {
+	stackChanClient := getStackChanClient(mac)
+	return stackChanClient != nil && stackChanClient.GetConn() != nil
 }
 
 // Encapsulate binary messages for custom protocol (type + data length + data)
