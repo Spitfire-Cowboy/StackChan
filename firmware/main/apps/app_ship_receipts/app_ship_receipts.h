@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: MIT
  */
 #pragma once
+#include "ship_receipts_scene.h"
 #include <mooncake.h>
-#include <cstdint>
 #include <array>
-#include <string_view>
+#include <cstdint>
 
 /**
  * @brief Ship Receipts app shell.
@@ -26,34 +26,19 @@ public:
     void onClose() override;
 
 private:
-    struct Beat {
-        std::string_view title;
-        std::string_view line;
-        std::string_view emotion;
-        uint32_t duration_ms;
-        int yaw_angle;
-        int pitch_angle;
-        int speed;
-        uint8_t led_r;
-        uint8_t led_g;
-        uint8_t led_b;
-        bool play_notification;
-    };
-
-    static constexpr std::array<Beat, 4> _beats{{
-        {"SHIP.RECEIPTS", "Host-driven scenes belong in the app layer.", "neutral", 3600, 0, 0, 420, 0, 0, 0,
-         false},
-        {"HEIKE", "Bell sounds. All things impermanent.", "sad", 4200, 180, 170, 320, 64, 40, 0, true},
-        {"ODYSSEY", "A card beat can become status plus speech.", "happy", 3600, -220, 110, 320, 0, 40, 72,
-         false},
-        {"APP BOUNDARY", "Motion, LEDs, and audio cues stay generic.", "doubtful", 4200, 0, 40, 260, 36, 0, 56,
-         true},
+    static constexpr std::array<const char*, 4> _scene_json{{
+        R"json({"title":"SHIP.RECEIPTS","line":"Host-driven scenes belong in the app layer.","emotion":"neutral","duration_ms":3600,"motion":{"yaw_angle":0,"pitch_angle":0,"speed":420},"led":{"r":0,"g":0,"b":0},"play_notification":false})json",
+        R"json({"title":"HEIKE","line":"Bell sounds. All things impermanent.","emotion":"sad","duration_ms":4200,"motion":{"yaw_angle":180,"pitch_angle":170,"speed":320},"led":{"r":64,"g":40,"b":0},"play_notification":true})json",
+        R"json({"title":"ODYSSEY","line":"A card beat can become status plus speech.","emotion":"happy","duration_ms":3600,"motion":{"yaw_angle":-220,"pitch_angle":110,"speed":320},"led":{"r":0,"g":40,"b":72},"play_notification":false})json",
+        R"json({"title":"APP BOUNDARY","line":"Motion, LEDs, and audio cues stay generic.","emotion":"doubtful","duration_ms":4200,"motion":{"yaw_angle":0,"pitch_angle":40,"speed":260},"led":{"r":36,"g":0,"b":56},"play_notification":true})json",
     }};
 
-    void applyBeat(const Beat& beat);
+    bool loadScene(size_t index, ship_receipts::ScenePayload& out_scene);
+    void applyBeat(const ship_receipts::ScenePayload& beat);
     void clearBeat();
     void advanceBeat();
 
     uint32_t _beat_started_at = 0;
     size_t _beat_index        = 0;
+    ship_receipts::ScenePayload _active_scene{};
 };

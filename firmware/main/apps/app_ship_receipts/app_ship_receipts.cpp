@@ -49,7 +49,9 @@ void AppShipReceipts::onOpen()
     }
 
     _beat_index = 0;
-    applyBeat(_beats[_beat_index]);
+    if (loadScene(_beat_index, _active_scene)) {
+        applyBeat(_active_scene);
+    }
     view::pop_a_toast("Ship Receipts demo shell ready", view::ToastType::Info, 1800);
 }
 
@@ -62,8 +64,7 @@ void AppShipReceipts::onRunning()
     view::update_status_bar();
 
     if (_beat_started_at > 0) {
-        const auto& beat = _beats[_beat_index];
-        if (GetHAL().millis() - _beat_started_at >= beat.duration_ms) {
+        if (GetHAL().millis() - _beat_started_at >= _active_scene.duration_ms) {
             advanceBeat();
         }
     }
@@ -81,17 +82,28 @@ void AppShipReceipts::onClose()
     view::destroy_status_bar();
 }
 
-void AppShipReceipts::applyBeat(const Beat& beat)
+bool AppShipReceipts::loadScene(size_t index, ship_receipts::ScenePayload& out_scene)
+{
+    std::string error_message;
+    if (!ship_receipts::parse_scene_payload(_scene_json[index], out_scene, &error_message)) {
+        mclog::tagError(getAppInfo().name, "failed to parse scene %u: %s", static_cast<unsigned>(index),
+                        error_message.c_str());
+        return false;
+    }
+    return true;
+}
+
+void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
 {
     auto* display = Board::GetInstance().GetDisplay();
     auto& stack   = GetStackChan();
     auto& motion  = stack.motion();
 
     if (display) {
-        display->SetStatus(beat.title.data());
-        display->SetEmotion(beat.emotion.data());
-        display->SetChatMessage("assistant", beat.line.data());
-        display->ShowNotification(beat.title.data(), 1400);
+        display->SetStatus(beat.title.c_str());
+        display->SetEmotion(beat.emotion.c_str());
+        display->SetChatMessage("assistant", beat.line.c_str());
+        display->ShowNotification(beat.title.c_str(), 1400);
     }
 
     if (beat.play_notification) {
@@ -117,6 +129,8 @@ void AppShipReceipts::clearBeat()
 
 void AppShipReceipts::advanceBeat()
 {
-    _beat_index = (_beat_index + 1) % _beats.size();
-    applyBeat(_beats[_beat_index]);
+    _beat_index = (_beat_index + 1) % _scene_json.size();
+    if (loadScene(_beat_index, _active_scene)) {
+        applyBeat(_active_scene);
+    }
 }
