@@ -95,10 +95,7 @@ void AppShipReceipts::onOpen()
         }
     });
 
-    _beat_index = 0;
-    if (loadScene(_beat_index, _active_scene)) {
-        applyBeat(_active_scene);
-    }
+    enterDemoRotation();
     view::pop_a_toast("Ship Receipts demo shell ready", view::ToastType::Info, 1800);
 }
 
@@ -117,7 +114,11 @@ void AppShipReceipts::onRunning()
 
     if (_beat_started_at > 0) {
         if (GetHAL().millis() - _beat_started_at >= _active_scene.duration_ms) {
-            advanceBeat();
+            if (_sequence_state == SequenceState::LiveOverride) {
+                resumeDemoRotation();
+            } else {
+                advanceBeat();
+            }
         }
     }
 }
@@ -177,6 +178,26 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
     _beat_started_at = GetHAL().millis();
 }
 
+void AppShipReceipts::enterDemoRotation()
+{
+    _sequence_state = SequenceState::DemoRotation;
+    _beat_index     = 0;
+    if (loadScene(_beat_index, _active_scene)) {
+        applyBeat(_active_scene);
+    }
+    mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation");
+}
+
+void AppShipReceipts::resumeDemoRotation()
+{
+    _sequence_state = SequenceState::DemoRotation;
+    _beat_index     = (_beat_index + 1) % _scene_json.size();
+    if (loadScene(_beat_index, _active_scene)) {
+        applyBeat(_active_scene);
+    }
+    mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (resumed)");
+}
+
 void AppShipReceipts::enqueueSceneJson(std::string json)
 {
     std::lock_guard<std::mutex> lock(_queue_mutex);
@@ -204,8 +225,10 @@ void AppShipReceipts::applyQueuedSceneJson(const std::string& json)
         return;
     }
 
+    _sequence_state = SequenceState::LiveOverride;
     _active_scene = std::move(parsed);
     applyBeat(_active_scene);
+    mclog::tagInfo(getAppInfo().name, "sequence state -> live override");
     view::pop_a_toast("Ship Receipts scene received", view::ToastType::Info, 1200);
 }
 
