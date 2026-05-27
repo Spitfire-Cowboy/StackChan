@@ -146,6 +146,8 @@ bool AppShipReceipts::loadScene(size_t index, ship_receipts::ScenePayload& out_s
                         error_message.c_str());
         return false;
     }
+    mclog::tagInfo(getAppInfo().name, "loaded scene id='{}' mode='{}' presentation='{}'", out_scene.scene_id,
+                   out_scene.mode, out_scene.presentation_type);
     return true;
 }
 
@@ -162,6 +164,9 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
         display->SetChatMessage("assistant", speech.c_str());
         display->ShowNotification(beat.title.c_str(), 1400);
     }
+
+    mclog::tagInfo(getAppInfo().name, "apply beat id='{}' mode='{}' template='{}'", beat.scene_id, beat.mode,
+                   beat.visual_template);
 
     if (beat.play_notification) {
         hal_bridge::app_play_sound(OGG_NEW_NOTIFICATION);

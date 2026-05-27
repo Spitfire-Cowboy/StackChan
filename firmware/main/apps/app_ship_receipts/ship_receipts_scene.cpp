@@ -44,6 +44,12 @@ bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::strin
         return false;
     }
 
+    if (doc["id"].is<const char*>()) {
+        out_payload.scene_id = doc["id"].as<const char*>();
+    }
+    if (doc["mode"].is<const char*>()) {
+        out_payload.mode = doc["mode"].as<const char*>();
+    }
     if (doc["title"].is<const char*>()) {
         out_payload.title = doc["title"].as<const char*>();
     }

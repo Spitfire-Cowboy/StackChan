@@ -1,6 +1,8 @@
 {
   "cmd": "shipReceiptsScene",
   "data": {
+    "id": "heike-avatar-1",
+    "mode": "heike",
     "title": "HEIKE",
     "speaker": "BIWA GUIDE",
     "line": "Bell sounds. All things impermanent.",
