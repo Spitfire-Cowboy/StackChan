@@ -5,13 +5,7 @@
  */
 #pragma once
 #include <mooncake.h>
-#include <memory>
-
-namespace smooth_ui_toolkit::lvgl_cpp {
-class Container;
-class Label;
-class Button;
-}
+#include <cstdint>
 
 /**
  * @brief Ship Receipts app shell.
@@ -30,10 +24,5 @@ public:
     void onClose() override;
 
 private:
-    std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Container> _panel;
-    std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Label> _title;
-    std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Label> _subtitle;
-    std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Label> _body;
-    std::unique_ptr<smooth_ui_toolkit::lvgl_cpp::Button> _button_quit;
+    uint32_t _open_tick = 0;
 };
-
