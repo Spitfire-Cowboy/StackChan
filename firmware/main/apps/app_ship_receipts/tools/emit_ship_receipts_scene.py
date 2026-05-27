@@ -45,6 +45,7 @@ def build_output(scene: dict, fmt: str) -> dict:
             "mode": scene.get("mode", ""),
             "presentation_type": scene.get("presentation_type", ""),
             "visual_template": scene.get("visual_template", ""),
+            "sticky": scene.get("sticky", False),
         }
     raise ValueError(f"unknown format: {fmt}")
 

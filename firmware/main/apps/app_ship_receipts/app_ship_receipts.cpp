@@ -114,7 +114,9 @@ void AppShipReceipts::onRunning()
 
     if (_beat_started_at > 0) {
         if (GetHAL().millis() - _beat_started_at >= _active_scene.duration_ms) {
-            if (_sequence_state == SequenceState::LiveOverride) {
+            if (_sequence_state == SequenceState::LiveSticky) {
+                _beat_started_at = 0;
+            } else if (_sequence_state == SequenceState::LiveOverride) {
                 resumeDemoRotation();
             } else {
                 advanceBeat();
@@ -166,8 +168,8 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
         display->ShowNotification(beat.title.c_str(), 1400);
     }
 
-    mclog::tagInfo(getAppInfo().name, "apply beat id='{}' mode='{}' template='{}'", beat.scene_id, beat.mode,
-                   beat.visual_template);
+    mclog::tagInfo(getAppInfo().name, "apply beat id='{}' mode='{}' template='{}' sticky={}", beat.scene_id,
+                   beat.mode, beat.visual_template, beat.sticky);
 
     if (beat.play_notification) {
         hal_bridge::app_play_sound(OGG_NEW_NOTIFICATION);
@@ -225,11 +227,15 @@ void AppShipReceipts::applyQueuedSceneJson(const std::string& json)
         return;
     }
 
-    _sequence_state = SequenceState::LiveOverride;
+    _sequence_state = parsed.sticky ? SequenceState::LiveSticky : SequenceState::LiveOverride;
     _active_scene = std::move(parsed);
     applyBeat(_active_scene);
-    mclog::tagInfo(getAppInfo().name, "sequence state -> live override");
-    view::pop_a_toast("Ship Receipts scene received", view::ToastType::Info, 1200);
+    mclog::tagInfo(getAppInfo().name, "sequence state -> {}", _sequence_state == SequenceState::LiveSticky
+                                                              ? "live sticky"
+                                                              : "live override");
+    view::pop_a_toast(_sequence_state == SequenceState::LiveSticky ? "Sticky Ship Receipts scene received"
+                                                                   : "Ship Receipts scene received",
+                      view::ToastType::Info, 1200);
 }
 
 void AppShipReceipts::clearBeat()

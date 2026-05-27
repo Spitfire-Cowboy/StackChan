@@ -32,6 +32,7 @@ private:
     enum class SequenceState {
         DemoRotation = 0,
         LiveOverride,
+        LiveSticky,
     };
 
     static constexpr std::array<const char*, 4> _scene_json{{

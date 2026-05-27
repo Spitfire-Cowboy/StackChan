@@ -26,6 +26,7 @@ struct ScenePayload {
     uint8_t led_g                 = 0;
     uint8_t led_b                 = 0;
     bool play_notification        = false;
+    bool sticky                   = false;
 };
 
 bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);

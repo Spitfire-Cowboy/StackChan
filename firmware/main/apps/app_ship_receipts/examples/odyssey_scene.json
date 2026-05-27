@@ -17,5 +17,6 @@
     "g": 40,
     "b": 72
   },
-  "play_notification": false
+  "play_notification": false,
+  "sticky": false
 }
