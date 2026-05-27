@@ -161,6 +161,10 @@ bool parse_control_command(const char* json, ControlAction& out_action, std::str
         out_action = ControlAction::ResumeDemo;
         return true;
     }
+    if (cmd == "shipReceiptsShowStatus") {
+        out_action = ControlAction::ShowStatus;
+        return true;
+    }
 
     set_error(error_message, "unknown ship receipts control command");
     return false;

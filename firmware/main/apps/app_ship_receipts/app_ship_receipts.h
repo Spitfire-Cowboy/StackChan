@@ -49,6 +49,8 @@ private:
     void applyBeat(const ship_receipts::ScenePayload& beat);
     void enterDemoRotation();
     void resumeDemoRotation();
+    const char* sequenceStateLabel() const;
+    std::string statusSummary() const;
     void clearBeat();
     void advanceBeat();
 

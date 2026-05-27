@@ -40,7 +40,6 @@ const char* resolveEmotion(const ship_receipts::ScenePayload& beat)
     }
     return beat.emotion.c_str();
 }
-
 }  // namespace
 
 AppShipReceipts::AppShipReceipts()
@@ -200,6 +199,26 @@ void AppShipReceipts::resumeDemoRotation()
     mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (resumed)");
 }
 
+const char* AppShipReceipts::sequenceStateLabel() const
+{
+    switch (_sequence_state) {
+        case SequenceState::DemoRotation:
+            return "demo";
+        case SequenceState::LiveOverride:
+            return "live";
+        case SequenceState::LiveSticky:
+            return "sticky";
+    }
+    return "unknown";
+}
+
+std::string AppShipReceipts::statusSummary() const
+{
+    return fmt::format("state={} mode={} scene={}", sequenceStateLabel(),
+                       _active_scene.mode.empty() ? "-" : _active_scene.mode,
+                       _active_scene.scene_id.empty() ? "-" : _active_scene.scene_id);
+}
+
 void AppShipReceipts::enqueueSceneJson(std::string json)
 {
     std::lock_guard<std::mutex> lock(_queue_mutex);
@@ -225,6 +244,12 @@ void AppShipReceipts::handleQueuedCommand(const std::string& json)
         if (action == ship_receipts::ControlAction::ResumeDemo) {
             resumeDemoRotation();
             view::pop_a_toast("Ship Receipts demo rotation resumed", view::ToastType::Info, 1200);
+            return;
+        }
+        if (action == ship_receipts::ControlAction::ShowStatus) {
+            auto summary = statusSummary();
+            mclog::tagInfo(getAppInfo().name, "status -> {}", summary);
+            view::pop_a_toast(summary, view::ToastType::Info, 1800);
             return;
         }
     }

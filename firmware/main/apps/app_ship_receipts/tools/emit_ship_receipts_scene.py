@@ -23,6 +23,8 @@ def build_output(scene: dict, fmt: str) -> dict:
         return {"cmd": "shipReceiptsScene", "data": scene}
     if fmt == "resume-demo":
         return {"cmd": "shipReceiptsResumeDemo"}
+    if fmt == "show-status":
+        return {"cmd": "shipReceiptsShowStatus"}
     if fmt == "ws-text":
         return {
             "name": "ship-receipts",
@@ -57,7 +59,7 @@ def main() -> None:
     parser.add_argument("--scene", choices=sorted(SCENES.keys()), default="heike")
     parser.add_argument(
         "--format",
-        choices=["scene", "command", "ble-config", "ws-text", "transport-note", "metadata", "resume-demo"],
+        choices=["scene", "command", "ble-config", "ws-text", "transport-note", "metadata", "resume-demo", "show-status"],
         default="command",
     )
     args = parser.parse_args()
