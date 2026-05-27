@@ -105,7 +105,7 @@ void AppShipReceipts::onRunning()
 
     std::string queued_scene;
     if (dequeueSceneJson(queued_scene)) {
-        applyQueuedSceneJson(queued_scene);
+        handleQueuedCommand(queued_scene);
     }
 
     GetStackChan().update();
@@ -217,8 +217,18 @@ bool AppShipReceipts::dequeueSceneJson(std::string& out_json)
     return true;
 }
 
-void AppShipReceipts::applyQueuedSceneJson(const std::string& json)
+void AppShipReceipts::handleQueuedCommand(const std::string& json)
 {
+    ship_receipts::ControlAction action;
+    std::string control_error;
+    if (ship_receipts::parse_control_command(json.c_str(), action, &control_error)) {
+        if (action == ship_receipts::ControlAction::ResumeDemo) {
+            resumeDemoRotation();
+            view::pop_a_toast("Ship Receipts demo rotation resumed", view::ToastType::Info, 1200);
+            return;
+        }
+    }
+
     ship_receipts::ScenePayload parsed;
     std::string error_message;
     if (!ship_receipts::parse_scene_command(json.c_str(), parsed, &error_message)) {

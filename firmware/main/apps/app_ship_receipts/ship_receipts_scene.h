@@ -9,6 +9,11 @@
 
 namespace ship_receipts {
 
+enum class ControlAction {
+    None = 0,
+    ResumeDemo,
+};
+
 struct ScenePayload {
     std::string scene_id          = "";
     std::string mode              = "";
@@ -31,5 +36,6 @@ struct ScenePayload {
 
 bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);
 bool parse_scene_command(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);
+bool parse_control_command(const char* json, ControlAction& out_action, std::string* error_message = nullptr);
 
 }  // namespace ship_receipts
