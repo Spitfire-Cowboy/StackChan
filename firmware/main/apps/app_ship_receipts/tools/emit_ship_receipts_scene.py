@@ -19,12 +19,25 @@ def load_scene(name: str) -> dict:
 def build_output(scene: dict, fmt: str) -> dict:
     if fmt == "scene":
         return scene
-    if fmt == "command":
+    if fmt in {"command", "ble-config"}:
         return {"cmd": "shipReceiptsScene", "data": scene}
     if fmt == "ws-text":
         return {
             "name": "ship-receipts",
             "content": json.dumps({"cmd": "shipReceiptsScene", "data": scene}, ensure_ascii=False),
+        }
+    if fmt == "transport-note":
+        return {
+            "ble": {
+                "service_uuid": "e2e5e5e0-1234-5678-1234-56789abcdef0",
+                "characteristic_uuid": "e2e5e5e3-1234-5678-1234-56789abcdef0",
+                "shape": "ble-config",
+            },
+            "websocket": {
+                "surface": "text-message",
+                "sender_name": "ship-receipts",
+                "shape": "ws-text",
+            },
         }
     raise ValueError(f"unknown format: {fmt}")
 
@@ -32,7 +45,11 @@ def build_output(scene: dict, fmt: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Emit Ship Receipts app scene payloads for StackChan")
     parser.add_argument("--scene", choices=sorted(SCENES.keys()), default="heike")
-    parser.add_argument("--format", choices=["scene", "command", "ws-text"], default="command")
+    parser.add_argument(
+        "--format",
+        choices=["scene", "command", "ble-config", "ws-text", "transport-note"],
+        default="command",
+    )
     args = parser.parse_args()
 
     scene = load_scene(args.scene)
