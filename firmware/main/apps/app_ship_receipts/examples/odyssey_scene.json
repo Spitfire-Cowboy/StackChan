@@ -1,6 +1,8 @@
 {
   "title": "ODYSSEY",
   "line": "A card beat can become status plus speech.",
+  "presentation_type": "card",
+  "visual_template": "status_card",
   "emotion": "happy",
   "duration_ms": 3600,
   "motion": {

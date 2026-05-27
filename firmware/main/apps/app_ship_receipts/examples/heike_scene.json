@@ -1,6 +1,9 @@
 {
   "title": "HEIKE",
+  "speaker": "BIWA GUIDE",
   "line": "Bell sounds. All things impermanent.",
+  "presentation_type": "avatar",
+  "visual_template": "avatar_beat",
   "emotion": "sad",
   "duration_ms": 4200,
   "motion": {
