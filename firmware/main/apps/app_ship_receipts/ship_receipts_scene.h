@@ -10,6 +10,8 @@
 namespace ship_receipts {
 
 struct ScenePayload {
+    std::string scene_id          = "";
+    std::string mode              = "";
     std::string title             = "SHIP.RECEIPTS";
     std::string line              = "";
     std::string speaker           = "";

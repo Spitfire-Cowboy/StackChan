@@ -39,6 +39,13 @@ def build_output(scene: dict, fmt: str) -> dict:
                 "shape": "ws-text",
             },
         }
+    if fmt == "metadata":
+        return {
+            "id": scene.get("id", ""),
+            "mode": scene.get("mode", ""),
+            "presentation_type": scene.get("presentation_type", ""),
+            "visual_template": scene.get("visual_template", ""),
+        }
     raise ValueError(f"unknown format: {fmt}")
 
 
@@ -47,7 +54,7 @@ def main() -> None:
     parser.add_argument("--scene", choices=sorted(SCENES.keys()), default="heike")
     parser.add_argument(
         "--format",
-        choices=["scene", "command", "ble-config", "ws-text", "transport-note"],
+        choices=["scene", "command", "ble-config", "ws-text", "transport-note", "metadata"],
         default="command",
     )
     args = parser.parse_args()

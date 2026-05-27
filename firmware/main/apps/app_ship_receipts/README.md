@@ -116,6 +116,8 @@ scene semantics.
 
 The app-local scene payload currently understands:
 
+- `id` (optional scene identity for host/app orchestration)
+- `mode` (optional app mode such as `heike` or `odyssey`)
 - `title`
 - `line`
 - `speaker` (optional)
@@ -135,6 +137,15 @@ Current rendering behavior:
 - `presentation_type = "card"`
   - forces a neutral face
   - treats speech as supporting card copy instead of character dialogue
+
+Current metadata behavior:
+
+- `id`
+  - preserved so host and app can refer to a stable beat identity
+  - logged by the app when a scene is loaded/applied
+- `mode`
+  - preserved so higher-level Ship Receipts mode selection can stay app-local
+  - logged by the app when a scene is loaded/applied
 
 ## Example payloads and host helper
 
