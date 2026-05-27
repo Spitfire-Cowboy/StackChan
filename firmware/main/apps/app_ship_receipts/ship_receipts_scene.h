@@ -12,6 +12,7 @@ namespace ship_receipts {
 enum class ControlAction {
     None = 0,
     ResumeDemo,
+    ShowStatus,
 };
 
 struct ScenePayload {
