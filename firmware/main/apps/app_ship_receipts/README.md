@@ -75,3 +75,34 @@ The new parser is intentionally app-local:
 - it gives us a clean place to experiment with app-specific scene packets
 - it creates an extraction seam later if some subset becomes generic enough to
   upstream
+
+## Current ingest paths
+
+The app now accepts app-local scene payloads through existing transport
+surfaces, without inventing a Ship Receipts-specific core protocol first:
+
+- BLE config writes
+- websocket text messages from the `ship-receipts` sender name
+
+Accepted shapes:
+
+- a raw scene object
+- or a command envelope:
+
+```json
+{
+  "cmd": "shipReceiptsScene",
+  "data": {
+    "title": "HEIKE",
+    "line": "Bell sounds. All things impermanent.",
+    "emotion": "sad",
+    "duration_ms": 4200,
+    "motion": {"yaw_angle": 180, "pitch_angle": 170, "speed": 320},
+    "led": {"r": 64, "g": 40, "b": 0},
+    "play_notification": true
+  }
+}
+```
+
+This keeps the transport generic while letting the Ship Receipts app own its
+scene semantics.

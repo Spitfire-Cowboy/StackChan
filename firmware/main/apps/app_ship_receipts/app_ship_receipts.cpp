@@ -13,6 +13,7 @@
 #include <mooncake_log.h>
 #include <stackchan/stackchan.h>
 #include <smooth_lvgl.hpp>
+#include <string_view>
 
 using namespace mooncake;
 using namespace stackchan;
@@ -37,8 +38,22 @@ void AppShipReceipts::onOpen()
 {
     mclog::tagInfo(getAppInfo().name, "on open");
 
+    std::unique_ptr<view::LoadingPage> loading_page;
     {
         LvglLockGuard lock;
+        loading_page = std::make_unique<view::LoadingPage>(0x93C5FD, 0x0F172A);
+        loading_page->setMessage("Starting\n scene services...");
+    }
+
+    GetHAL().startBleServer();
+    GetHAL().startWebSocketAvatarService([&](std::string_view msg) {
+        LvglLockGuard lock;
+        loading_page->setMessage(msg);
+    });
+
+    {
+        LvglLockGuard lock;
+        loading_page.reset();
 
         auto avatar = std::make_unique<avatar::DefaultAvatar>();
         avatar->init(lv_screen_active());
@@ -47,6 +62,13 @@ void AppShipReceipts::onOpen()
         view::create_home_indicator([&]() { close(); }, 0x93C5FD, 0x0F172A);
         view::create_status_bar(0x93C5FD, 0x0F172A);
     }
+
+    GetHAL().onBleConfigData.connect([&](const char* data) { enqueueSceneJson(data ? data : ""); });
+    GetHAL().onWsTextMessage.connect([&](const WsTextMessage_t& message) {
+        if (message.name == "ship-receipts") {
+            enqueueSceneJson(message.content);
+        }
+    });
 
     _beat_index = 0;
     if (loadScene(_beat_index, _active_scene)) {
@@ -58,6 +80,11 @@ void AppShipReceipts::onOpen()
 void AppShipReceipts::onRunning()
 {
     LvglLockGuard lock;
+
+    std::string queued_scene;
+    if (dequeueSceneJson(queued_scene)) {
+        applyQueuedSceneJson(queued_scene);
+    }
 
     GetStackChan().update();
     view::update_home_indicator();
@@ -78,8 +105,12 @@ void AppShipReceipts::onClose()
 
     clearBeat();
     GetStackChan().resetAvatar();
+    GetHAL().onBleConfigData.clear();
+    GetHAL().onWsTextMessage.clear();
     view::destroy_home_indicator();
     view::destroy_status_bar();
+
+    GetHAL().requestWarmReboot(1);
 }
 
 bool AppShipReceipts::loadScene(size_t index, ship_receipts::ScenePayload& out_scene)
@@ -115,6 +146,38 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
     _beat_started_at = GetHAL().millis();
 }
 
+void AppShipReceipts::enqueueSceneJson(std::string json)
+{
+    std::lock_guard<std::mutex> lock(_queue_mutex);
+    _pending_scene_json.push_back(std::move(json));
+}
+
+bool AppShipReceipts::dequeueSceneJson(std::string& out_json)
+{
+    std::lock_guard<std::mutex> lock(_queue_mutex);
+    if (_pending_scene_json.empty()) {
+        return false;
+    }
+    out_json = std::move(_pending_scene_json.front());
+    _pending_scene_json.pop_front();
+    return true;
+}
+
+void AppShipReceipts::applyQueuedSceneJson(const std::string& json)
+{
+    ship_receipts::ScenePayload parsed;
+    std::string error_message;
+    if (!ship_receipts::parse_scene_command(json.c_str(), parsed, &error_message)) {
+        mclog::tagError(getAppInfo().name, "failed to parse incoming scene: %s", error_message.c_str());
+        view::pop_a_toast("Ship Receipts scene parse failed", view::ToastType::Error, 2200);
+        return;
+    }
+
+    _active_scene = std::move(parsed);
+    applyBeat(_active_scene);
+    view::pop_a_toast("Ship Receipts scene received", view::ToastType::Info, 1200);
+}
+
 void AppShipReceipts::clearBeat()
 {
     if (auto* display = Board::GetInstance().GetDisplay()) {
@@ -125,6 +188,8 @@ void AppShipReceipts::clearBeat()
     GetHAL().showRgbColor(0, 0, 0);
     GetStackChan().motion().goHome(320);
     _beat_started_at = 0;
+    std::lock_guard<std::mutex> lock(_queue_mutex);
+    _pending_scene_json.clear();
 }
 
 void AppShipReceipts::advanceBeat()

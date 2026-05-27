@@ -8,6 +8,9 @@
 #include <mooncake.h>
 #include <array>
 #include <cstdint>
+#include <deque>
+#include <mutex>
+#include <string>
 
 /**
  * @brief Ship Receipts app shell.
@@ -34,10 +37,15 @@ private:
     }};
 
     bool loadScene(size_t index, ship_receipts::ScenePayload& out_scene);
+    void enqueueSceneJson(std::string json);
+    bool dequeueSceneJson(std::string& out_json);
+    void applyQueuedSceneJson(const std::string& json);
     void applyBeat(const ship_receipts::ScenePayload& beat);
     void clearBeat();
     void advanceBeat();
 
+    std::mutex _queue_mutex;
+    std::deque<std::string> _pending_scene_json;
     uint32_t _beat_started_at = 0;
     size_t _beat_index        = 0;
     ship_receipts::ScenePayload _active_scene{};
