@@ -107,6 +107,30 @@ Accepted shapes:
 This keeps the transport generic while letting the Ship Receipts app own its
 scene semantics.
 
+## Current scene fields
+
+The app-local scene payload currently understands:
+
+- `title`
+- `line`
+- `speaker` (optional)
+- `presentation_type` (`card` or `avatar`)
+- `visual_template` (currently metadata, preserved for future renderer choices)
+- `emotion`
+- `duration_ms`
+- `motion`
+- `led`
+- `play_notification`
+
+Current rendering behavior:
+
+- `presentation_type = "avatar"`
+  - keeps the authored emotion
+  - prefixes speech with `speaker says:` when a speaker is present
+- `presentation_type = "card"`
+  - forces a neutral face
+  - treats speech as supporting card copy instead of character dialogue
+
 ## Example payloads and host helper
 
 Checked-in examples live here:

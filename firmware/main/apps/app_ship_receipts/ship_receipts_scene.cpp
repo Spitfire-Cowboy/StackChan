@@ -50,8 +50,17 @@ bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::strin
     if (doc["line"].is<const char*>()) {
         out_payload.line = doc["line"].as<const char*>();
     }
+    if (doc["speaker"].is<const char*>()) {
+        out_payload.speaker = doc["speaker"].as<const char*>();
+    }
     if (doc["emotion"].is<const char*>()) {
         out_payload.emotion = doc["emotion"].as<const char*>();
+    }
+    if (doc["presentation_type"].is<const char*>()) {
+        out_payload.presentation_type = doc["presentation_type"].as<const char*>();
+    }
+    if (doc["visual_template"].is<const char*>()) {
+        out_payload.visual_template = doc["visual_template"].as<const char*>();
     }
     if (doc["duration_ms"].is<uint32_t>()) {
         out_payload.duration_ms = doc["duration_ms"].as<uint32_t>();

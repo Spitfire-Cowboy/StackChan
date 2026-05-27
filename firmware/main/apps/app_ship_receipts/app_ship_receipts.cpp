@@ -18,6 +18,31 @@
 using namespace mooncake;
 using namespace stackchan;
 
+namespace {
+
+std::string buildSpeech(const ship_receipts::ScenePayload& beat)
+{
+    if (beat.speaker.empty()) {
+        return beat.line;
+    }
+
+    if (beat.presentation_type == "card") {
+        return fmt::format("{} · {}", beat.speaker, beat.line);
+    }
+
+    return fmt::format("{} says: {}", beat.speaker, beat.line);
+}
+
+const char* resolveEmotion(const ship_receipts::ScenePayload& beat)
+{
+    if (beat.presentation_type == "card") {
+        return "neutral";
+    }
+    return beat.emotion.c_str();
+}
+
+}  // namespace
+
 AppShipReceipts::AppShipReceipts()
 {
     setAppInfo().name = "SHIP.RECEIPTS";
@@ -129,11 +154,12 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
     auto* display = Board::GetInstance().GetDisplay();
     auto& stack   = GetStackChan();
     auto& motion  = stack.motion();
+    auto speech   = buildSpeech(beat);
 
     if (display) {
         display->SetStatus(beat.title.c_str());
-        display->SetEmotion(beat.emotion.c_str());
-        display->SetChatMessage("assistant", beat.line.c_str());
+        display->SetEmotion(resolveEmotion(beat));
+        display->SetChatMessage("assistant", speech.c_str());
         display->ShowNotification(beat.title.c_str(), 1400);
     }
 
