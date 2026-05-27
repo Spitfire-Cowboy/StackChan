@@ -74,6 +74,9 @@ bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::strin
     if (doc["play_notification"].is<bool>()) {
         out_payload.play_notification = doc["play_notification"].as<bool>();
     }
+    if (doc["sticky"].is<bool>()) {
+        out_payload.sticky = doc["sticky"].as<bool>();
+    }
 
     if (doc["motion"].is<ArduinoJson::JsonObject>()) {
         auto motion = doc["motion"].as<ArduinoJson::JsonObject>();

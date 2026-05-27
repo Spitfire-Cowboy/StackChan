@@ -121,6 +121,10 @@ The app currently distinguishes between two app-local sequencing states:
 - `LiveOverride`
   - temporarily applies an externally injected scene from BLE or websocket text
   - when that beat's `duration_ms` expires, the app returns to demo rotation
+- `LiveSticky`
+  - applies an externally injected scene that stays active after its first
+    duration window
+  - remains active until another scene replaces it or the app is closed
 
 This keeps "what the app is doing right now" as app state instead of pushing
 Ship Receipts sequencing policy down into StackChan core.
@@ -141,6 +145,7 @@ The app-local scene payload currently understands:
 - `motion`
 - `led`
 - `play_notification`
+- `sticky`
 
 Current rendering behavior:
 
@@ -159,6 +164,9 @@ Current metadata behavior:
 - `mode`
   - preserved so higher-level Ship Receipts mode selection can stay app-local
   - logged by the app when a scene is loaded/applied
+- `sticky`
+  - `false` means a live injected scene expires back to demo rotation
+  - `true` means a live injected scene remains active until replaced
 
 ## Example payloads and host helper
 
