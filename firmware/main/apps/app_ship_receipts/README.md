@@ -45,7 +45,10 @@ This split gives us:
 ## Current shell behavior
 
 The current shell is still intentionally small, but it now demonstrates an
-app-local "director" loop that uses generic StackChan core capabilities:
+app-local "director" loop backed by a tiny scene payload parser.
+
+Each sample beat is authored as app-local JSON and then mapped onto generic
+StackChan primitives.
 
 - opens as a normal StackChan app
 - attaches the default avatar
@@ -62,3 +65,13 @@ app-local "director" loop that uses generic StackChan core capabilities:
 This keeps the seam app-local while proving a stronger point than the original
 stub: Ship Receipts can direct StackChan through existing core APIs without
 turning the core firmware into a Ship Receipts-specific fork.
+
+## Why the tiny parser matters
+
+The new parser is intentionally app-local:
+
+- it lets us evolve Ship Receipts scene semantics without changing StackChan
+  core first
+- it gives us a clean place to experiment with app-specific scene packets
+- it creates an extraction seam later if some subset becomes generic enough to
+  upstream
