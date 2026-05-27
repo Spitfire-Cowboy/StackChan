@@ -84,6 +84,11 @@ surfaces, without inventing a Ship Receipts-specific core protocol first:
 - BLE config writes
 - websocket text messages from the `ship-receipts` sender name
 
+BLE path details:
+
+- service UUID: `e2e5e5e0-1234-5678-1234-56789abcdef0`
+- config characteristic UUID: `e2e5e5e3-1234-5678-1234-56789abcdef0`
+
 Accepted shapes:
 
 - a raw scene object
@@ -149,8 +154,13 @@ Examples:
 ```bash
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format scene
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format command
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ble-config
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ws-text
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format transport-note
 ```
 
 The `ws-text` format emits the `name` + `content` shape expected by the app's
 websocket text-message ingest path.
+
+The `ble-config` format is the exact JSON shape accepted by the existing BLE
+config characteristic.
