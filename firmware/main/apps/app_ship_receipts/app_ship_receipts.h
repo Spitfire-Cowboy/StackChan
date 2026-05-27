@@ -29,6 +29,11 @@ public:
     void onClose() override;
 
 private:
+    enum class SequenceState {
+        DemoRotation = 0,
+        LiveOverride,
+    };
+
     static constexpr std::array<const char*, 4> _scene_json{{
         R"json({"id":"app-shell-card","mode":"ship-receipts-shell","title":"SHIP.RECEIPTS","line":"Host-driven scenes belong in the app layer.","presentation_type":"card","visual_template":"title_card","emotion":"neutral","duration_ms":3600,"motion":{"yaw_angle":0,"pitch_angle":0,"speed":420},"led":{"r":0,"g":0,"b":0},"play_notification":false})json",
         R"json({"id":"heike-avatar-1","mode":"heike","title":"HEIKE","speaker":"BIWA GUIDE","line":"Bell sounds. All things impermanent.","presentation_type":"avatar","visual_template":"avatar_beat","emotion":"sad","duration_ms":4200,"motion":{"yaw_angle":180,"pitch_angle":170,"speed":320},"led":{"r":64,"g":40,"b":0},"play_notification":true})json",
@@ -41,6 +46,8 @@ private:
     bool dequeueSceneJson(std::string& out_json);
     void applyQueuedSceneJson(const std::string& json);
     void applyBeat(const ship_receipts::ScenePayload& beat);
+    void enterDemoRotation();
+    void resumeDemoRotation();
     void clearBeat();
     void advanceBeat();
 
@@ -48,5 +55,6 @@ private:
     std::deque<std::string> _pending_scene_json;
     uint32_t _beat_started_at = 0;
     size_t _beat_index        = 0;
+    SequenceState _sequence_state = SequenceState::DemoRotation;
     ship_receipts::ScenePayload _active_scene{};
 };

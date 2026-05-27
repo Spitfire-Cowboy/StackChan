@@ -112,6 +112,19 @@ Accepted shapes:
 This keeps the transport generic while letting the Ship Receipts app own its
 scene semantics.
 
+## Current sequence states
+
+The app currently distinguishes between two app-local sequencing states:
+
+- `DemoRotation`
+  - rotates through built-in sample beats
+- `LiveOverride`
+  - temporarily applies an externally injected scene from BLE or websocket text
+  - when that beat's `duration_ms` expires, the app returns to demo rotation
+
+This keeps "what the app is doing right now" as app state instead of pushing
+Ship Receipts sequencing policy down into StackChan core.
+
 ## Current scene fields
 
 The app-local scene payload currently understands:
