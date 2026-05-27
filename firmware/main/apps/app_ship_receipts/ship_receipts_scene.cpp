@@ -89,4 +89,32 @@ bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::strin
     return true;
 }
 
+bool parse_scene_command(const char* json, ScenePayload& out_payload, std::string* error_message)
+{
+    if (!json) {
+        set_error(error_message, "scene command was null");
+        return false;
+    }
+
+    ArduinoJson::JsonDocument doc;
+    auto error = ArduinoJson::deserializeJson(doc, json);
+    if (error) {
+        set_error(error_message, error.c_str());
+        return false;
+    }
+
+    if (doc["cmd"].is<const char*>() && std::string_view(doc["cmd"].as<const char*>()) == "shipReceiptsScene") {
+        if (!doc["data"].is<ArduinoJson::JsonObject>()) {
+            set_error(error_message, "shipReceiptsScene command missing object data");
+            return false;
+        }
+
+        std::string nested;
+        ArduinoJson::serializeJson(doc["data"], nested);
+        return parse_scene_payload(nested.c_str(), out_payload, error_message);
+    }
+
+    return parse_scene_payload(json, out_payload, error_message);
+}
+
 }  // namespace ship_receipts

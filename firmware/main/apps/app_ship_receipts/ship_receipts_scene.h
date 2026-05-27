@@ -24,5 +24,6 @@ struct ScenePayload {
 };
 
 bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);
+bool parse_scene_command(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);
 
 }  // namespace ship_receipts
