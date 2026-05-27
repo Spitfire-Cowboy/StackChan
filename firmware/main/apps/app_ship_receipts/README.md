@@ -112,6 +112,17 @@ Accepted shapes:
 This keeps the transport generic while letting the Ship Receipts app own its
 scene semantics.
 
+Supported control envelope:
+
+```json
+{
+  "cmd": "shipReceiptsResumeDemo"
+}
+```
+
+That command explicitly releases any current live override or sticky scene and
+returns the app to built-in demo rotation.
+
 ## Current sequence states
 
 The app currently distinguishes between two app-local sequencing states:
@@ -175,6 +186,7 @@ Checked-in examples live here:
 - [examples/heike_scene.json](./examples/heike_scene.json)
 - [examples/odyssey_scene.json](./examples/odyssey_scene.json)
 - [examples/ship_receipts_scene_command.json](./examples/ship_receipts_scene_command.json)
+- [examples/ship_receipts_resume_demo_command.json](./examples/ship_receipts_resume_demo_command.json)
 
 A tiny helper can emit the supported payload shapes without adding any new
 dependencies:
@@ -189,6 +201,7 @@ python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py -
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ble-config
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ws-text
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format transport-note
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format resume-demo
 ```
 
 The `ws-text` format emits the `name` + `content` shape expected by the app's

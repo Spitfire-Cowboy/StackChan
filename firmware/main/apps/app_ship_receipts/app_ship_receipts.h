@@ -45,7 +45,7 @@ private:
     bool loadScene(size_t index, ship_receipts::ScenePayload& out_scene);
     void enqueueSceneJson(std::string json);
     bool dequeueSceneJson(std::string& out_json);
-    void applyQueuedSceneJson(const std::string& json);
+    void handleQueuedCommand(const std::string& json);
     void applyBeat(const ship_receipts::ScenePayload& beat);
     void enterDemoRotation();
     void resumeDemoRotation();

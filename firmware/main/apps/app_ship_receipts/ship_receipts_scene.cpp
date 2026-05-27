@@ -135,4 +135,35 @@ bool parse_scene_command(const char* json, ScenePayload& out_payload, std::strin
     return parse_scene_payload(json, out_payload, error_message);
 }
 
+bool parse_control_command(const char* json, ControlAction& out_action, std::string* error_message)
+{
+    out_action = ControlAction::None;
+
+    if (!json) {
+        set_error(error_message, "control command was null");
+        return false;
+    }
+
+    ArduinoJson::JsonDocument doc;
+    auto error = ArduinoJson::deserializeJson(doc, json);
+    if (error) {
+        set_error(error_message, error.c_str());
+        return false;
+    }
+
+    if (!doc["cmd"].is<const char*>()) {
+        set_error(error_message, "control command missing cmd");
+        return false;
+    }
+
+    auto cmd = std::string_view(doc["cmd"].as<const char*>());
+    if (cmd == "shipReceiptsResumeDemo") {
+        out_action = ControlAction::ResumeDemo;
+        return true;
+    }
+
+    set_error(error_message, "unknown ship receipts control command");
+    return false;
+}
+
 }  // namespace ship_receipts
