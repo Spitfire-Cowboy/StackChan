@@ -106,3 +106,27 @@ Accepted shapes:
 
 This keeps the transport generic while letting the Ship Receipts app own its
 scene semantics.
+
+## Example payloads and host helper
+
+Checked-in examples live here:
+
+- [examples/heike_scene.json](./examples/heike_scene.json)
+- [examples/odyssey_scene.json](./examples/odyssey_scene.json)
+- [examples/ship_receipts_scene_command.json](./examples/ship_receipts_scene_command.json)
+
+A tiny helper can emit the supported payload shapes without adding any new
+dependencies:
+
+- [tools/emit_ship_receipts_scene.py](./tools/emit_ship_receipts_scene.py)
+
+Examples:
+
+```bash
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format scene
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format command
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ws-text
+```
+
+The `ws-text` format emits the `name` + `content` shape expected by the app's
+websocket text-message ingest path.

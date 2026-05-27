@@ -1,0 +1,17 @@
+{
+  "title": "ODYSSEY",
+  "line": "A card beat can become status plus speech.",
+  "emotion": "happy",
+  "duration_ms": 3600,
+  "motion": {
+    "yaw_angle": -220,
+    "pitch_angle": 110,
+    "speed": 320
+  },
+  "led": {
+    "r": 0,
+    "g": 40,
+    "b": 72
+  },
+  "play_notification": false
+}
