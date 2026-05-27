@@ -29,6 +29,11 @@ This split gives us:
 - Odyssey / Heike / future mode selection
 - app-local diagnostics relevant to Ship Receipts mode
 - branding and copy specific to this app
+- app-level use of generic core capabilities such as:
+  - avatar skin + speech
+  - motion updates
+  - audio cue playback
+  - transport-fed scene packets
 
 ## What should stay out
 
@@ -37,3 +42,14 @@ This split gives us:
 - generic small-screen layout helpers
 - generic packet logging / debugging
 
+## Current shell behavior
+
+The initial shell intentionally does very little:
+
+- opens as a normal StackChan app
+- attaches the default avatar
+- speaks an architecture reminder about app vs core boundaries
+- uses the standard home indicator and status bar
+
+This keeps the first seam tiny while still proving that `ship-receipts`
+can live as an app instead of a core firmware fork.
