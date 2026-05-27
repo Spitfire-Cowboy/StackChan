@@ -1,0 +1,17 @@
+{
+  "title": "HEIKE",
+  "line": "Bell sounds. All things impermanent.",
+  "emotion": "sad",
+  "duration_ms": 4200,
+  "motion": {
+    "yaw_angle": 180,
+    "pitch_angle": 170,
+    "speed": 320
+  },
+  "led": {
+    "r": 64,
+    "g": 40,
+    "b": 0
+  },
+  "play_notification": true
+}
