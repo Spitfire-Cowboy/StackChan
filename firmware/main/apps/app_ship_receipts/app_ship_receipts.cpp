@@ -199,6 +199,25 @@ void AppShipReceipts::resumeDemoRotation()
     mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (resumed)");
 }
 
+bool AppShipReceipts::setDemoMode(std::string_view mode)
+{
+    for (size_t i = 0; i < _scene_json.size(); ++i) {
+        ship_receipts::ScenePayload candidate;
+        if (!loadScene(i, candidate)) {
+            continue;
+        }
+        if (candidate.mode == mode) {
+            _sequence_state = SequenceState::DemoRotation;
+            _beat_index     = i;
+            _active_scene   = std::move(candidate);
+            applyBeat(_active_scene);
+            mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (mode={})", mode);
+            return true;
+        }
+    }
+    return false;
+}
+
 const char* AppShipReceipts::sequenceStateLabel() const
 {
     switch (_sequence_state) {
@@ -239,8 +258,9 @@ bool AppShipReceipts::dequeueSceneJson(std::string& out_json)
 void AppShipReceipts::handleQueuedCommand(const std::string& json)
 {
     ship_receipts::ControlAction action;
+    std::string mode;
     std::string control_error;
-    if (ship_receipts::parse_control_command(json.c_str(), action, &control_error)) {
+    if (ship_receipts::parse_control_command(json.c_str(), action, &mode, &control_error)) {
         if (action == ship_receipts::ControlAction::ResumeDemo) {
             resumeDemoRotation();
             view::pop_a_toast("Ship Receipts demo rotation resumed", view::ToastType::Info, 1200);
@@ -250,6 +270,15 @@ void AppShipReceipts::handleQueuedCommand(const std::string& json)
             auto summary = statusSummary();
             mclog::tagInfo(getAppInfo().name, "status -> {}", summary);
             view::pop_a_toast(summary, view::ToastType::Info, 1800);
+            return;
+        }
+        if (action == ship_receipts::ControlAction::SetMode) {
+            if (setDemoMode(mode)) {
+                view::pop_a_toast(fmt::format("Ship Receipts mode -> {}", mode), view::ToastType::Info, 1500);
+            } else {
+                view::pop_a_toast(fmt::format("Unknown Ship Receipts mode: {}", mode), view::ToastType::Warning,
+                                  1800);
+            }
             return;
         }
     }
