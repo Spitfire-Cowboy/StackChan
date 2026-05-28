@@ -138,6 +138,18 @@ app-local state, including:
 - current mode
 - current scene id
 
+Mode selection command:
+
+```json
+{
+  "cmd": "shipReceiptsSetMode",
+  "mode": "heike"
+}
+```
+
+That command explicitly jumps the built-in demo rotation to the first beat for
+the requested Ship Receipts mode.
+
 ## Current sequence states
 
 The app currently distinguishes between two app-local sequencing states:
@@ -203,6 +215,7 @@ Checked-in examples live here:
 - [examples/ship_receipts_scene_command.json](./examples/ship_receipts_scene_command.json)
 - [examples/ship_receipts_resume_demo_command.json](./examples/ship_receipts_resume_demo_command.json)
 - [examples/ship_receipts_show_status_command.json](./examples/ship_receipts_show_status_command.json)
+- [examples/ship_receipts_set_mode_command.json](./examples/ship_receipts_set_mode_command.json)
 
 A tiny helper can emit the supported payload shapes without adding any new
 dependencies:
@@ -219,6 +232,7 @@ python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py -
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format transport-note
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format resume-demo
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format show-status
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format set-mode
 ```
 
 The `ws-text` format emits the `name` + `content` shape expected by the app's

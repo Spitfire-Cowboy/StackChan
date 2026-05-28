@@ -135,9 +135,13 @@ bool parse_scene_command(const char* json, ScenePayload& out_payload, std::strin
     return parse_scene_payload(json, out_payload, error_message);
 }
 
-bool parse_control_command(const char* json, ControlAction& out_action, std::string* error_message)
+bool parse_control_command(const char* json, ControlAction& out_action, std::string* out_mode,
+                           std::string* error_message)
 {
     out_action = ControlAction::None;
+    if (out_mode) {
+        out_mode->clear();
+    }
 
     if (!json) {
         set_error(error_message, "control command was null");
@@ -163,6 +167,17 @@ bool parse_control_command(const char* json, ControlAction& out_action, std::str
     }
     if (cmd == "shipReceiptsShowStatus") {
         out_action = ControlAction::ShowStatus;
+        return true;
+    }
+    if (cmd == "shipReceiptsSetMode") {
+        if (!doc["mode"].is<const char*>()) {
+            set_error(error_message, "shipReceiptsSetMode missing mode");
+            return false;
+        }
+        out_action = ControlAction::SetMode;
+        if (out_mode) {
+            *out_mode = doc["mode"].as<const char*>();
+        }
         return true;
     }
 

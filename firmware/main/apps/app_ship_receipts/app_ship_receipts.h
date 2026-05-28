@@ -49,6 +49,7 @@ private:
     void applyBeat(const ship_receipts::ScenePayload& beat);
     void enterDemoRotation();
     void resumeDemoRotation();
+    bool setDemoMode(std::string_view mode);
     const char* sequenceStateLabel() const;
     std::string statusSummary() const;
     void clearBeat();

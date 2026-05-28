@@ -13,6 +13,7 @@ enum class ControlAction {
     None = 0,
     ResumeDemo,
     ShowStatus,
+    SetMode,
 };
 
 struct ScenePayload {
@@ -37,6 +38,7 @@ struct ScenePayload {
 
 bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);
 bool parse_scene_command(const char* json, ScenePayload& out_payload, std::string* error_message = nullptr);
-bool parse_control_command(const char* json, ControlAction& out_action, std::string* error_message = nullptr);
+bool parse_control_command(const char* json, ControlAction& out_action, std::string* out_mode = nullptr,
+                           std::string* error_message = nullptr);
 
 }  // namespace ship_receipts
