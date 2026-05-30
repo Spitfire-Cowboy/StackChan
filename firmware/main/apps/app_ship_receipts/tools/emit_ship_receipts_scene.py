@@ -7,8 +7,9 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 
 SCENES = {
-    "heike": EXAMPLES / "heike_scene.json",
-    "odyssey": EXAMPLES / "odyssey_scene.json",
+    "local": EXAMPLES / "local_scene.json",
+    "global": EXAMPLES / "global_scene.json",
+    "party": EXAMPLES / "party_scene.json",
 }
 
 
@@ -58,7 +59,7 @@ def build_output(scene: dict, fmt: str) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Emit Ship Receipts app scene payloads for StackChan")
-    parser.add_argument("--scene", choices=sorted(SCENES.keys()), default="heike")
+    parser.add_argument("--scene", choices=sorted(SCENES.keys()), default="local")
     parser.add_argument(
         "--format",
         choices=["scene", "command", "ble-config", "ws-text", "transport-note", "metadata", "resume-demo", "show-status", "set-mode"],

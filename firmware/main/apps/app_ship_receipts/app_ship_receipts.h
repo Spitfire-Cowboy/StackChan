@@ -35,11 +35,13 @@ private:
         LiveSticky,
     };
 
-    static constexpr std::array<const char*, 4> _scene_json{{
-        R"json({"id":"app-shell-card","mode":"ship-receipts-shell","title":"SHIP.RECEIPTS","line":"Host-driven scenes belong in the app layer.","presentation_type":"card","visual_template":"title_card","emotion":"neutral","duration_ms":3600,"motion":{"yaw_angle":0,"pitch_angle":0,"speed":420},"led":{"r":0,"g":0,"b":0},"play_notification":false})json",
-        R"json({"id":"heike-avatar-1","mode":"heike","title":"HEIKE","speaker":"BIWA GUIDE","line":"Bell sounds. All things impermanent.","presentation_type":"avatar","visual_template":"avatar_beat","emotion":"sad","duration_ms":4200,"motion":{"yaw_angle":180,"pitch_angle":170,"speed":320},"led":{"r":64,"g":40,"b":0},"play_notification":true})json",
-        R"json({"id":"odyssey-card-1","mode":"odyssey","title":"ODYSSEY","line":"A card beat can become status plus speech.","presentation_type":"card","visual_template":"status_card","emotion":"happy","duration_ms":3600,"motion":{"yaw_angle":-220,"pitch_angle":110,"speed":320},"led":{"r":0,"g":40,"b":72},"play_notification":false})json",
-        R"json({"id":"app-boundary-avatar","mode":"ship-receipts-shell","title":"APP BOUNDARY","speaker":"STACKCHAN","line":"Motion, LEDs, and audio cues stay generic.","presentation_type":"avatar","visual_template":"avatar_beat","emotion":"doubtful","duration_ms":4200,"motion":{"yaw_angle":0,"pitch_angle":40,"speed":260},"led":{"r":36,"g":0,"b":56},"play_notification":true})json",
+    static constexpr std::array<const char*, 6> _scene_json{{
+        R"json({"id":"local-card-1","mode":"local","title":"LOCAL MODE","line":"Offline receipts, score loops, and streaks stay on-device.","presentation_type":"card","visual_template":"title_card","emotion":"neutral","duration_ms":3200,"motion":{"yaw_angle":0,"pitch_angle":0,"speed":420},"led":{"r":0,"g":48,"b":22},"play_notification":false})json",
+        R"json({"id":"local-avatar-1","mode":"local","title":"LOCAL MODE","speaker":"BUILDER","line":"No accounts. No auth. Just build and score receipts.","presentation_type":"avatar","visual_template":"avatar_beat","emotion":"happy","duration_ms":3600,"motion":{"yaw_angle":140,"pitch_angle":160,"speed":320},"led":{"r":0,"g":64,"b":28},"play_notification":true})json",
+        R"json({"id":"global-card-1","mode":"global","title":"GLOBAL MODE","line":"Proof envelopes can be exported for public verification.","presentation_type":"card","visual_template":"status_card","emotion":"neutral","duration_ms":3200,"motion":{"yaw_angle":-80,"pitch_angle":90,"speed":300},"led":{"r":0,"g":28,"b":72},"play_notification":false})json",
+        R"json({"id":"global-avatar-1","mode":"global","title":"GLOBAL MODE","speaker":"LEDGER","line":"Verified receipts earn canonical reputation.","presentation_type":"avatar","visual_template":"avatar_beat","emotion":"doubtful","duration_ms":3800,"motion":{"yaw_angle":-220,"pitch_angle":110,"speed":320},"led":{"r":0,"g":40,"b":96},"play_notification":true})json",
+        R"json({"id":"party-card-1","mode":"party","title":"PARTY MODE","line":"Track friends, rivals, and benchmarks beside your streaks.","presentation_type":"card","visual_template":"title_card","emotion":"neutral","duration_ms":3200,"motion":{"yaw_angle":80,"pitch_angle":40,"speed":300},"led":{"r":72,"g":24,"b":72},"play_notification":false})json",
+        R"json({"id":"party-avatar-1","mode":"party","title":"PARTY MODE","speaker":"SCOUT","line":"Add GitHub users to the party and chase better proofs.","presentation_type":"avatar","visual_template":"avatar_beat","emotion":"happy","duration_ms":3800,"motion":{"yaw_angle":220,"pitch_angle":120,"speed":320},"led":{"r":96,"g":28,"b":96},"play_notification":true})json",
     }};
 
     bool loadScene(size_t index, ship_receipts::ScenePayload& out_scene);
@@ -60,5 +62,6 @@ private:
     uint32_t _beat_started_at = 0;
     size_t _beat_index        = 0;
     SequenceState _sequence_state = SequenceState::DemoRotation;
+    std::string _selected_demo_mode = "local";
     ship_receipts::ScenePayload _active_scene{};
 };

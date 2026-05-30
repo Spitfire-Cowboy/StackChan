@@ -1,4 +1,4 @@
 {
   "cmd": "shipReceiptsSetMode",
-  "mode": "heike"
+  "mode": "local"
 }
