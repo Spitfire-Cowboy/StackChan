@@ -1,24 +1,24 @@
 {
   "cmd": "shipReceiptsScene",
   "data": {
-    "id": "heike-avatar-1",
-    "mode": "heike",
-    "title": "HEIKE",
-    "speaker": "BIWA GUIDE",
-    "line": "Bell sounds. All things impermanent.",
+    "id": "local-avatar-1",
+    "mode": "local",
+    "title": "LOCAL MODE",
+    "speaker": "BUILDER",
+    "line": "No accounts. No auth. Just build and score receipts.",
     "presentation_type": "avatar",
     "visual_template": "avatar_beat",
-    "emotion": "sad",
-    "duration_ms": 4200,
+    "emotion": "happy",
+    "duration_ms": 3600,
     "motion": {
-      "yaw_angle": 180,
-      "pitch_angle": 170,
+      "yaw_angle": 140,
+      "pitch_angle": 160,
       "speed": 320
     },
     "led": {
-      "r": 64,
-      "g": 40,
-      "b": 0
+      "r": 0,
+      "g": 64,
+      "b": 28
     },
     "play_notification": true,
     "sticky": false

@@ -26,7 +26,7 @@ This split gives us:
 ## What belongs here later
 
 - host scene packet consumers for Ship Receipts modes
-- Odyssey / Heike / future mode selection
+- local / global / party mode selection
 - app-local diagnostics relevant to Ship Receipts mode
 - branding and copy specific to this app
 - app-level use of generic core capabilities such as:
@@ -98,12 +98,12 @@ Accepted shapes:
 {
   "cmd": "shipReceiptsScene",
   "data": {
-    "title": "HEIKE",
-    "line": "Bell sounds. All things impermanent.",
-    "emotion": "sad",
-    "duration_ms": 4200,
-    "motion": {"yaw_angle": 180, "pitch_angle": 170, "speed": 320},
-    "led": {"r": 64, "g": 40, "b": 0},
+    "title": "LOCAL MODE",
+    "line": "No accounts. No auth. Just build and score receipts.",
+    "emotion": "happy",
+    "duration_ms": 3600,
+    "motion": {"yaw_angle": 140, "pitch_angle": 160, "speed": 320},
+    "led": {"r": 0, "g": 64, "b": 28},
     "play_notification": true
   }
 }
@@ -143,16 +143,16 @@ Mode selection command:
 ```json
 {
   "cmd": "shipReceiptsSetMode",
-  "mode": "heike"
+  "mode": "local"
 }
 ```
 
 That command explicitly jumps the built-in demo rotation to the first beat for
-the requested Ship Receipts mode.
+the requested Ship Receipts game mode.
 
 ## Current sequence states
 
-The app currently distinguishes between two app-local sequencing states:
+The app currently distinguishes between these app-local sequencing states:
 
 - `DemoRotation`
   - rotates through built-in sample beats
@@ -172,7 +172,7 @@ Ship Receipts sequencing policy down into StackChan core.
 The app-local scene payload currently understands:
 
 - `id` (optional scene identity for host/app orchestration)
-- `mode` (optional app mode such as `heike` or `odyssey`)
+- `mode` (optional app mode such as `local`, `global`, or `party`)
 - `title`
 - `line`
 - `speaker` (optional)
@@ -210,8 +210,9 @@ Current metadata behavior:
 
 Checked-in examples live here:
 
-- [examples/heike_scene.json](./examples/heike_scene.json)
-- [examples/odyssey_scene.json](./examples/odyssey_scene.json)
+- [examples/local_scene.json](./examples/local_scene.json)
+- [examples/global_scene.json](./examples/global_scene.json)
+- [examples/party_scene.json](./examples/party_scene.json)
 - [examples/ship_receipts_scene_command.json](./examples/ship_receipts_scene_command.json)
 - [examples/ship_receipts_resume_demo_command.json](./examples/ship_receipts_resume_demo_command.json)
 - [examples/ship_receipts_show_status_command.json](./examples/ship_receipts_show_status_command.json)
@@ -225,14 +226,14 @@ dependencies:
 Examples:
 
 ```bash
-python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format scene
-python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format command
-python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ble-config
-python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format ws-text
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene local --format scene
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene local --format command
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene local --format ble-config
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene local --format ws-text
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format transport-note
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format resume-demo
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --format show-status
-python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene heike --format set-mode
+python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene local --format set-mode
 ```
 
 The `ws-text` format emits the `name` + `content` shape expected by the app's

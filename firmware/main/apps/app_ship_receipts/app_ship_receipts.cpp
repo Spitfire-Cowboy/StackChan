@@ -182,9 +182,13 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
 void AppShipReceipts::enterDemoRotation()
 {
     _sequence_state = SequenceState::DemoRotation;
-    _beat_index     = 0;
-    if (loadScene(_beat_index, _active_scene)) {
-        applyBeat(_active_scene);
+    if (!setDemoMode(_selected_demo_mode)) {
+        _beat_index = 0;
+        if (loadScene(_beat_index, _active_scene)) {
+            applyBeat(_active_scene);
+        }
+        mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (fallback)");
+        return;
     }
     mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation");
 }
@@ -192,11 +196,27 @@ void AppShipReceipts::enterDemoRotation()
 void AppShipReceipts::resumeDemoRotation()
 {
     _sequence_state = SequenceState::DemoRotation;
-    _beat_index     = (_beat_index + 1) % _scene_json.size();
-    if (loadScene(_beat_index, _active_scene)) {
+    const auto start_index = _beat_index;
+    for (size_t offset = 1; offset <= _scene_json.size(); ++offset) {
+        const auto next_index = (start_index + offset) % _scene_json.size();
+        ship_receipts::ScenePayload candidate;
+        if (!loadScene(next_index, candidate)) {
+            continue;
+        }
+        if (!_selected_demo_mode.empty() && candidate.mode != _selected_demo_mode) {
+            continue;
+        }
+        _beat_index   = next_index;
+        _active_scene = std::move(candidate);
+        applyBeat(_active_scene);
+        mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (resumed)");
+        return;
+    }
+    if (loadScene(start_index, _active_scene)) {
+        _beat_index = start_index;
         applyBeat(_active_scene);
     }
-    mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (resumed)");
+    mclog::tagInfo(getAppInfo().name, "sequence state -> demo rotation (single-mode fallback)");
 }
 
 bool AppShipReceipts::setDemoMode(std::string_view mode)
@@ -208,6 +228,7 @@ bool AppShipReceipts::setDemoMode(std::string_view mode)
         }
         if (candidate.mode == mode) {
             _sequence_state = SequenceState::DemoRotation;
+            _selected_demo_mode = std::string(mode);
             _beat_index     = i;
             _active_scene   = std::move(candidate);
             applyBeat(_active_scene);
@@ -233,8 +254,9 @@ const char* AppShipReceipts::sequenceStateLabel() const
 
 std::string AppShipReceipts::statusSummary() const
 {
-    return fmt::format("state={} mode={} scene={}", sequenceStateLabel(),
+    return fmt::format("state={} mode={} selected={} scene={}", sequenceStateLabel(),
                        _active_scene.mode.empty() ? "-" : _active_scene.mode,
+                       _selected_demo_mode.empty() ? "-" : _selected_demo_mode,
                        _active_scene.scene_id.empty() ? "-" : _active_scene.scene_id);
 }
 
@@ -318,8 +340,5 @@ void AppShipReceipts::clearBeat()
 
 void AppShipReceipts::advanceBeat()
 {
-    _beat_index = (_beat_index + 1) % _scene_json.size();
-    if (loadScene(_beat_index, _active_scene)) {
-        applyBeat(_active_scene);
-    }
+    resumeDemoRotation();
 }
