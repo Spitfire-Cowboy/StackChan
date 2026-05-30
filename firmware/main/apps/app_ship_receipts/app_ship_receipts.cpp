@@ -33,6 +33,22 @@ std::string buildSpeech(const ship_receipts::ScenePayload& beat)
     return fmt::format("{} says: {}", beat.speaker, beat.line);
 }
 
+std::string buildStatusLabel(const ship_receipts::ScenePayload& beat)
+{
+    if (beat.mode.empty()) {
+        return "SHIP.RECEIPTS";
+    }
+    return fmt::format("SHIP.RECEIPTS · {}", beat.mode);
+}
+
+std::string buildAppReadyMessage(std::string_view mode)
+{
+    if (mode.empty()) {
+        return "Ship Receipts app ready";
+    }
+    return fmt::format("Ship Receipts · {} mode", mode);
+}
+
 const char* resolveEmotion(const ship_receipts::ScenePayload& beat)
 {
     if (beat.presentation_type == "card") {
@@ -95,7 +111,7 @@ void AppShipReceipts::onOpen()
     });
 
     enterDemoRotation();
-    view::pop_a_toast("Ship Receipts demo shell ready", view::ToastType::Info, 1800);
+    view::pop_a_toast(buildAppReadyMessage(_selected_demo_mode), view::ToastType::Info, 1800);
 }
 
 void AppShipReceipts::onRunning()
@@ -161,14 +177,15 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
     auto speech   = buildSpeech(beat);
 
     if (display) {
-        display->SetStatus(beat.title.c_str());
+        auto status = buildStatusLabel(beat);
+        display->SetStatus(status.c_str());
         display->SetEmotion(resolveEmotion(beat));
         display->SetChatMessage("assistant", speech.c_str());
-        display->ShowNotification(beat.title.c_str(), 1400);
+        display->ShowNotification(status.c_str(), 1400);
     }
 
-    mclog::tagInfo(getAppInfo().name, "apply beat id='{}' mode='{}' template='{}' sticky={}", beat.scene_id,
-                   beat.mode, beat.visual_template, beat.sticky);
+    mclog::tagInfo(getAppInfo().name, "apply beat id='{}' mode='{}' template='{}' sticky={} status='{}'", beat.scene_id,
+                   beat.mode, beat.visual_template, beat.sticky, buildStatusLabel(beat));
 
     if (beat.play_notification) {
         hal_bridge::app_play_sound(OGG_NEW_NOTIFICATION);
