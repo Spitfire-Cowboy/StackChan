@@ -13,12 +13,25 @@
 #include <mooncake_log.h>
 #include <stackchan/stackchan.h>
 #include <smooth_lvgl.hpp>
+#include <algorithm>
+#include <cmath>
 #include <string_view>
+#include <tuple>
 
 using namespace mooncake;
 using namespace stackchan;
 
 namespace {
+
+int clampValue(int value, int min_value, int max_value)
+{
+    return std::max(min_value, std::min(value, max_value));
+}
+
+uint8_t scaleColor(uint8_t value, float scale)
+{
+    return static_cast<uint8_t>(std::round(static_cast<float>(value) * scale));
+}
 
 std::string buildSpeech(const ship_receipts::ScenePayload& beat)
 {
@@ -55,6 +68,40 @@ const char* resolveEmotion(const ship_receipts::ScenePayload& beat)
         return "neutral";
     }
     return beat.emotion.c_str();
+}
+
+int resolveYawAngle(const ship_receipts::ScenePayload& beat)
+{
+    if (beat.presentation_type == "card") {
+        return clampValue(beat.yaw_angle / 3, -60, 60);
+    }
+    return clampValue(beat.yaw_angle, -180, 180);
+}
+
+int resolvePitchAngle(const ship_receipts::ScenePayload& beat)
+{
+    if (beat.presentation_type == "card") {
+        return clampValue(std::max(60, beat.pitch_angle / 2), 60, 140);
+    }
+    return clampValue(std::max(90, beat.pitch_angle), 90, 190);
+}
+
+int resolveMotionSpeed(const ship_receipts::ScenePayload& beat)
+{
+    if (beat.presentation_type == "card") {
+        return clampValue(beat.speed / 2, 120, 220);
+    }
+    return clampValue(beat.speed, 180, 320);
+}
+
+std::tuple<uint8_t, uint8_t, uint8_t> resolveLedColor(const ship_receipts::ScenePayload& beat)
+{
+    const auto scale = beat.presentation_type == "card" ? 0.28f : 0.45f;
+    return {
+        scaleColor(beat.led_r, scale),
+        scaleColor(beat.led_g, scale),
+        scaleColor(beat.led_b, scale),
+    };
 }
 }  // namespace
 
@@ -191,8 +238,18 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
         mclog::tagInfo(getAppInfo().name, "skip notification audio for ship receipts beat '{}'", beat.scene_id);
     }
 
-    GetHAL().showRgbColor(beat.led_r, beat.led_g, beat.led_b);
-    motion.moveWithSpeed(beat.yaw_angle, beat.pitch_angle, beat.speed);
+    const auto [led_r, led_g, led_b] = resolveLedColor(beat);
+    const auto yaw_angle = resolveYawAngle(beat);
+    const auto pitch_angle = resolvePitchAngle(beat);
+    const auto motion_speed = resolveMotionSpeed(beat);
+
+    mclog::tagInfo(getAppInfo().name,
+                   "resolved beat id='{}' motion=({}, {}, {}) led=({}, {}, {})",
+                   beat.scene_id, yaw_angle, pitch_angle, motion_speed,
+                   static_cast<int>(led_r), static_cast<int>(led_g), static_cast<int>(led_b));
+
+    GetHAL().showRgbColor(led_r, led_g, led_b);
+    motion.moveWithSpeed(yaw_angle, pitch_angle, motion_speed);
     _beat_started_at = GetHAL().millis();
 }
 
