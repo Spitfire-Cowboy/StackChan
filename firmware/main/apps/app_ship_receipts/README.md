@@ -208,6 +208,21 @@ Current rendering behavior:
   - forces a neutral face
   - treats speech as supporting card copy instead of character dialogue
 
+Current built-in mode coverage:
+
+- `local`
+  - offline single-player loop
+  - score, streak, and party growth stay on-device
+- `global`
+  - opt-in proof envelope export
+  - public verification and canonical reputation
+- `party`
+  - friendly comparison against party members and benchmarks
+  - local-first competition until someone exports a proof
+
+The built-in demo rotation now carries four beats per mode so the app can show
+more of each mode's actual semantics before it loops.
+
 Current metadata behavior:
 
 - `id`
