@@ -95,9 +95,9 @@ void AppShipReceipts::onOpen()
         LvglLockGuard lock;
         loading_page.reset();
 
-        auto avatar = std::make_unique<avatar::DefaultAvatar>();
-        avatar->init(lv_screen_active());
-        GetStackChan().attachAvatar(std::move(avatar));
+        if (auto* display = Board::GetInstance().GetDisplay()) {
+            display->SetupUI();
+        }
 
         view::create_home_indicator([&]() { close(); }, 0x93C5FD, 0x0F172A);
         view::create_status_bar(0x93C5FD, 0x0F172A);
