@@ -35,6 +35,20 @@ This split gives us:
   - audio cue playback
   - transport-fed scene packets
 
+## Current demo pacing
+
+The built-in `local` / `global` / `party` demo beats now apply a small amount of
+app-local pacing policy before touching hardware:
+
+- `card` beats are quieter:
+  - head motion is re-centered and slowed down
+  - RGB output is dimmed
+- `avatar` beats are still expressive, but motion is clamped to a smaller
+  range than the raw authored payload
+
+This keeps the app readable on a desk and avoids making the built-in demo loop
+feel like a constant hardware burn-in test.
+
 ## What should stay out
 
 - generic servo transport code
