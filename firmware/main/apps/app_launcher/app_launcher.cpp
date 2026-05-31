@@ -26,12 +26,11 @@ void AppLauncher::onLauncherOpen()
 
     LvglLockGuard lock;
 
-    if (!_startup_checked && !GetHAL().isAppConfiged()) {
-        mclog::tagInfo(getAppInfo().name, "app not configured, start startup worker");
-        _startup_worker = std::make_unique<setup_workers::StartupWorker>();
-    } else {
-        create_launcher_view();
-    }
+    // For this fork, prefer entering SHIP.RECEIPTS directly instead of blocking
+    // on first-run setup flows like Wi-Fi scanning.
+    _startup_checked = true;
+    _startup_worker.reset();
+    create_launcher_view();
 }
 
 void AppLauncher::onLauncherRunning()
