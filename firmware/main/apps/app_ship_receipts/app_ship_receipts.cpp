@@ -188,7 +188,7 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
                    beat.mode, beat.visual_template, beat.sticky, buildStatusLabel(beat));
 
     if (beat.play_notification) {
-        hal_bridge::app_play_sound(OGG_NEW_NOTIFICATION);
+        mclog::tagInfo(getAppInfo().name, "skip notification audio for ship receipts beat '{}'", beat.scene_id);
     }
 
     GetHAL().showRgbColor(beat.led_r, beat.led_g, beat.led_b);
