@@ -87,7 +87,7 @@ bool AppLauncher::maybe_open_initial_ship_receipts()
     }
 
     for (const auto& props : getAppProps()) {
-        if (props.name == "SHIP.RECEIPTS") {
+        if (props.info.name == "SHIP.RECEIPTS") {
             if (openApp(props.appID)) {
                 _opened_initial_ship_receipts = true;
                 mclog::tagInfo(getAppInfo().name, "auto-open ship receipts app, app id: {}", props.appID);
