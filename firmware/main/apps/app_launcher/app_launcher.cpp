@@ -70,11 +70,33 @@ void AppLauncher::onLauncherDestroy()
 void AppLauncher::create_launcher_view()
 {
     _view = std::make_unique<view::LauncherView>();
-    _view->init(getAppProps());
+    auto app_props = getAppProps();
+    _view->init(app_props);
     _view->onAppClicked = [&](int appID) {
         mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
         openApp(appID);
     };
+
+    maybe_open_initial_ship_receipts();
+}
+
+bool AppLauncher::maybe_open_initial_ship_receipts()
+{
+    if (_opened_initial_ship_receipts) {
+        return false;
+    }
+
+    for (const auto& props : getAppProps()) {
+        if (props.name == "SHIP.RECEIPTS") {
+            if (openApp(props.appID)) {
+                _opened_initial_ship_receipts = true;
+                mclog::tagInfo(getAppInfo().name, "auto-open ship receipts app, app id: {}", props.appID);
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void AppLauncher::screensaver_update()
