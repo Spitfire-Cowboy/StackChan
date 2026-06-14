@@ -37,6 +37,12 @@ enum class WsTextMessageMode {
     DisplayCard,
 };
 
+enum class WsDeviceControlAction {
+    Sleep = 0,
+    Wake,
+    PowerOff,
+};
+
 /**
  * @brief
  *
@@ -49,6 +55,10 @@ struct WsTextMessage_t {
     std::vector<std::string> lines;
     std::string accent = "#FFDF9A";
     uint32_t durationMs = 4000;
+};
+
+struct WsDeviceControl_t {
+    WsDeviceControlAction action = WsDeviceControlAction::Sleep;
 };
 
 /**
@@ -199,6 +209,9 @@ public:
     std::array<uint8_t, 6> getFactoryMac();
     std::string getFactoryMacString(std::string divider = "");
     void reboot();
+    void enterRemoteSleepMode();
+    void exitRemoteSleepMode();
+    void remotePowerOff();
     void updateHeapStatusLog();
     uint8_t getBatteryLevel();
     bool isBatteryCharging();
@@ -256,6 +269,7 @@ public:
     uitk::Signal<bool> onWsCallResponse;
     uitk::Signal<WsSignalSource> onWsCallEnd;
     uitk::Signal<const WsTextMessage_t&> onWsTextMessage;
+    uitk::Signal<const WsDeviceControl_t&> onWsDeviceControl;
     uitk::Signal<bool> onWsVideoModeChange;
     uitk::Signal<std::shared_ptr<LvglImage>> onWsVideoFrame;
     uitk::Signal<std::string_view> onWsDanceData;

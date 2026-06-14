@@ -295,6 +295,28 @@ public:
                             auto type = doc["type"].as<std::string>();
                             if (type == "displayCard" || type == "display_card") {
                                 text_msg.mode = WsTextMessageMode::DisplayCard;
+                            } else if (type == "deviceControl" || type == "device_control") {
+                                WsDeviceControl_t control_msg;
+
+                                if (!doc["action"].is<std::string>()) {
+                                    ESP_LOGE(_tag.c_str(), "deviceControl action missing");
+                                    return;
+                                }
+
+                                auto action = doc["action"].as<std::string>();
+                                if (action == "sleep") {
+                                    control_msg.action = WsDeviceControlAction::Sleep;
+                                } else if (action == "wake") {
+                                    control_msg.action = WsDeviceControlAction::Wake;
+                                } else if (action == "powerOff" || action == "power_off" || action == "shutdown") {
+                                    control_msg.action = WsDeviceControlAction::PowerOff;
+                                } else {
+                                    ESP_LOGE(_tag.c_str(), "unknown deviceControl action: %s", action.c_str());
+                                    return;
+                                }
+
+                                GetHAL().onWsDeviceControl.emit(control_msg);
+                                return;
                             }
                         }
 

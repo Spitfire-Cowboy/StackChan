@@ -51,7 +51,7 @@ WsDisplayCardView::WsDisplayCardView(lv_obj_t* parent, std::string title, const 
     _title->align(LV_ALIGN_TOP_LEFT, 0, 0);
     _title->setWidth(260);
     _title->setText(title.empty() ? "STATUS" : title);
-    _title->setTextFont(&lv_font_montserrat_18);
+    _title->setTextFont(&lv_font_montserrat_20);
     _title->setTextColor(lv_color_hex(0x47330A));
 
     _content = std::make_unique<uitk::lvgl_cpp::Label>(_card->get());
