@@ -30,6 +30,7 @@ void AppLauncher::onLauncherOpen()
     // on first-run setup flows like Wi-Fi scanning.
     _startup_checked = true;
     _startup_worker.reset();
+    _skip_initial_ship_receipts_open = GetHAL().getWarmRebootTarget() >= 0;
     create_launcher_view();
 }
 
@@ -81,6 +82,11 @@ void AppLauncher::create_launcher_view()
 
 bool AppLauncher::maybe_open_initial_ship_receipts()
 {
+    if (_skip_initial_ship_receipts_open) {
+        _skip_initial_ship_receipts_open = false;
+        return false;
+    }
+
     if (_opened_initial_ship_receipts) {
         return false;
     }
