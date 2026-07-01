@@ -26,12 +26,12 @@ void AppLauncher::onLauncherOpen()
 
     LvglLockGuard lock;
 
-    if (!_startup_checked && !GetHAL().isAppConfiged()) {
-        mclog::tagInfo(getAppInfo().name, "app not configured, start startup worker");
-        _startup_worker = std::make_unique<setup_workers::StartupWorker>();
-    } else {
-        create_launcher_view();
-    }
+    // For this fork, prefer entering SHIP.RECEIPTS directly instead of blocking
+    // on first-run setup flows like Wi-Fi scanning.
+    _startup_checked = true;
+    _startup_worker.reset();
+    _skip_initial_ship_receipts_open = GetHAL().getWarmRebootTarget() >= 0;
+    create_launcher_view();
 }
 
 void AppLauncher::onLauncherRunning()
@@ -70,11 +70,38 @@ void AppLauncher::onLauncherDestroy()
 void AppLauncher::create_launcher_view()
 {
     _view = std::make_unique<view::LauncherView>();
-    _view->init(getAppProps());
+    auto app_props = getAppProps();
+    _view->init(app_props);
     _view->onAppClicked = [&](int appID) {
         mclog::tagInfo(getAppInfo().name, "handle open app, app id: {}", appID);
         openApp(appID);
     };
+
+    maybe_open_initial_ship_receipts();
+}
+
+bool AppLauncher::maybe_open_initial_ship_receipts()
+{
+    if (_skip_initial_ship_receipts_open) {
+        _skip_initial_ship_receipts_open = false;
+        return false;
+    }
+
+    if (_opened_initial_ship_receipts) {
+        return false;
+    }
+
+    for (const auto& props : getAppProps()) {
+        if (props.info.name == "SHIP.RECEIPTS") {
+            if (openApp(props.appID)) {
+                _opened_initial_ship_receipts = true;
+                mclog::tagInfo(getAppInfo().name, "auto-open ship receipts app, app id: {}", props.appID);
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void AppLauncher::screensaver_update()
