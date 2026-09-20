@@ -23,9 +23,12 @@ private:
     std::unique_ptr<view::LauncherView> _view;
     std::unique_ptr<view::Screensaver> _screensaver;
     std::unique_ptr<setup_workers::StartupWorker> _startup_worker;
-    uint32_t _screensaver_timecount = 0;
-    bool _startup_checked           = false;
+    uint32_t _screensaver_timecount       = 0;
+    bool _startup_checked                 = false;
+    bool _opened_initial_ship_receipts    = false;
+    bool _skip_initial_ship_receipts_open = false;
 
     void create_launcher_view();
     void screensaver_update();
+    bool maybe_open_initial_ship_receipts();
 };

@@ -1,0 +1,23 @@
+{
+  "id": "party-avatar-1",
+  "mode": "party",
+  "title": "PARTY MODE",
+  "speaker": "SCOUT",
+  "line": "Add GitHub users to the party and chase better proofs.",
+  "presentation_type": "avatar",
+  "visual_template": "avatar_beat",
+  "emotion": "happy",
+  "duration_ms": 3800,
+  "motion": {
+    "yaw_angle": 220,
+    "pitch_angle": 120,
+    "speed": 320
+  },
+  "led": {
+    "r": 96,
+    "g": 28,
+    "b": 96
+  },
+  "play_notification": true,
+  "sticky": false
+}
