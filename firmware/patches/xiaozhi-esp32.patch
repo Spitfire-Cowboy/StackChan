@@ -271,3 +271,11 @@ index 7bc917b..874b137 100644
  };
  
  #endif // I2C_DEVICE_H
+diff --git a/main/boards/common/backlight.cc b/main/boards/common/backlight.cc
+index c62fd7a..f7b5a01 100644
+--- a/main/boards/common/backlight.cc
++++ b/main/boards/common/backlight.cc
+@@ -51,2 +51,2 @@ void Backlight::SetBrightness(uint8_t brightness, bool permanent) {
+-    if (brightness_ == brightness) {
++    if (brightness_ == brightness && target_brightness_ == brightness) {
+         return;

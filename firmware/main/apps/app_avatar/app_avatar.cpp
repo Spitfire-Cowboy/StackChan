@@ -202,6 +202,24 @@ void AppAvatar::onOpen()
         }
     });
 
+    GetHAL().onWsDeviceControl.connect([&](const WsDeviceControl_t& control) {
+        LvglLockGuard lvgl_lock;
+
+        switch (control.action) {
+            case WsDeviceControlAction::Sleep:
+                GetHAL().enterRemoteSleepMode();
+                break;
+            case WsDeviceControlAction::Wake:
+                GetHAL().exitRemoteSleepMode();
+                break;
+            case WsDeviceControlAction::PowerOff:
+                GetHAL().remotePowerOff();
+                break;
+            default:
+                break;
+        }
+    });
+
     GetHAL().onWsDanceData.connect([&](std::string_view data) {
         LvglLockGuard lvgl_lock;
         auto sequence = stackchan::animation::parse_sequence_from_json(data.data());
@@ -279,6 +297,7 @@ void AppAvatar::onClose()
         GetHAL().onWsCallRequest.clear();
         GetHAL().onWsCallEnd.clear();
         GetHAL().onWsTextMessage.clear();
+        GetHAL().onWsDeviceControl.clear();
         GetHAL().onWsDanceData.clear();
 
         view::destroy_home_indicator();

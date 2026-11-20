@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include "hal.h"
+#include "board/hal_bridge.h"
 #include <memory>
 #include <mooncake_log.h>
 #include <nvs_flash.h>
@@ -85,6 +86,21 @@ std::string Hal::getFactoryMacString(std::string divider)
 void Hal::reboot()
 {
     esp_restart();
+}
+
+void Hal::enterRemoteSleepMode()
+{
+    hal_bridge::board_set_power_save_mode(true);
+}
+
+void Hal::exitRemoteSleepMode()
+{
+    hal_bridge::board_set_power_save_mode(false);
+}
+
+void Hal::remotePowerOff()
+{
+    hal_bridge::board_power_off();
 }
 
 static void _confirm_ota_image_if_stable()
