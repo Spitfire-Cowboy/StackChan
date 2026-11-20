@@ -379,14 +379,14 @@ std::string AppShipReceipts::statusSummary() const
 
 void AppShipReceipts::enqueueSceneJson(std::string json)
 {
-    ship_receipts::ControlAction action;
-    const bool is_control = ship_receipts::parse_control_command(json.c_str(), action);
-
     if (json.size() > kMaxPendingSceneBytes) {
         mclog::tagWarn(getAppInfo().name, "drop oversized ship receipts message ({} bytes)",
                        static_cast<unsigned>(json.size()));
         return;
     }
+
+    ship_receipts::ControlAction action;
+    const bool is_control = ship_receipts::parse_control_command(json.c_str(), action);
 
     std::lock_guard<std::mutex> lock(_queue_mutex);
     while (_pending_scene_json.size() >= kMaxPendingSceneMessages ||
