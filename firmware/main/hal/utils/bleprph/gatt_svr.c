@@ -196,7 +196,7 @@ static int stackchan_svc_access(uint16_t conn_handle, uint16_t attr_handle, stru
                         attr_handle);
 
             if (attr_handle == stackchan_motion_handle) {
-                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN, stackchan_motion_data, &stackchan_motion_len);
+                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN - 1, stackchan_motion_data, &stackchan_motion_len);
                 if (rc == 0) {
                     stackchan_motion_data[stackchan_motion_len] = '\0';
                     // MODLOG_DFLT(INFO, "Motion data received (%d bytes): %s", stackchan_motion_len,
@@ -209,7 +209,7 @@ static int stackchan_svc_access(uint16_t conn_handle, uint16_t attr_handle, stru
                 }
                 return rc;
             } else if (attr_handle == stackchan_avatar_handle) {
-                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN, stackchan_avatar_data, &stackchan_avatar_len);
+                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN - 1, stackchan_avatar_data, &stackchan_avatar_len);
                 if (rc == 0) {
                     stackchan_avatar_data[stackchan_avatar_len] = '\0';
                     // MODLOG_DFLT(INFO, "Avatar data received (%d bytes): %s", stackchan_avatar_len,
@@ -222,7 +222,7 @@ static int stackchan_svc_access(uint16_t conn_handle, uint16_t attr_handle, stru
                 }
                 return rc;
             } else if (attr_handle == stackchan_config_handle) {
-                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN, stackchan_config_data, &stackchan_config_len);
+                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN - 1, stackchan_config_data, &stackchan_config_len);
                 if (rc == 0) {
                     stackchan_config_data[stackchan_config_len] = '\0';
                     MODLOG_DFLT(INFO, "Config data received (%d bytes): %s", stackchan_config_len,
@@ -235,7 +235,7 @@ static int stackchan_svc_access(uint16_t conn_handle, uint16_t attr_handle, stru
                 }
                 return rc;
             } else if (attr_handle == stackchan_rgb_handle) {
-                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN, stackchan_rgb_data, &stackchan_rgb_len);
+                rc = gatt_svr_write(ctxt->om, 0, STACKCHAN_MAX_JSON_LEN - 1, stackchan_rgb_data, &stackchan_rgb_len);
                 if (rc == 0) {
                     stackchan_rgb_data[stackchan_rgb_len] = '\0';
                     // MODLOG_DFLT(INFO, "RGB data received (%d bytes): %s", stackchan_rgb_len, stackchan_rgb_data);

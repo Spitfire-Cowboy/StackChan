@@ -1,0 +1,22 @@
+{
+  "id": "global-card-1",
+  "mode": "global",
+  "title": "GLOBAL MODE",
+  "line": "Proof envelopes can be exported for public verification.",
+  "presentation_type": "card",
+  "visual_template": "status_card",
+  "emotion": "neutral",
+  "duration_ms": 3200,
+  "motion": {
+    "yaw_angle": -80,
+    "pitch_angle": 90,
+    "speed": 300
+  },
+  "led": {
+    "r": 0,
+    "g": 28,
+    "b": 72
+  },
+  "play_notification": false,
+  "sticky": false
+}
