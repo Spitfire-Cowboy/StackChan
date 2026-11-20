@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: Apache-2.0
  */
 #pragma once
 #include <cstdint>

@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: Apache-2.0
  */
 #include "ship_receipts_scene.h"
 #include <ArduinoJson.hpp>
@@ -41,6 +41,11 @@ bool parse_scene_payload(const char* json, ScenePayload& out_payload, std::strin
     auto error = ArduinoJson::deserializeJson(doc, json);
     if (error) {
         set_error(error_message, error.c_str());
+        return false;
+    }
+
+    if (!doc.is<ArduinoJson::JsonObject>()) {
+        set_error(error_message, "scene payload must be an object");
         return false;
     }
 
@@ -121,6 +126,11 @@ bool parse_scene_command(const char* json, ScenePayload& out_payload, std::strin
         return false;
     }
 
+    if (!doc.is<ArduinoJson::JsonObject>()) {
+        set_error(error_message, "scene command must be an object");
+        return false;
+    }
+
     if (doc["cmd"].is<const char*>() && std::string_view(doc["cmd"].as<const char*>()) == "shipReceiptsScene") {
         if (!doc["data"].is<ArduinoJson::JsonObject>()) {
             set_error(error_message, "shipReceiptsScene command missing object data");
@@ -130,6 +140,11 @@ bool parse_scene_command(const char* json, ScenePayload& out_payload, std::strin
         std::string nested;
         ArduinoJson::serializeJson(doc["data"], nested);
         return parse_scene_payload(nested.c_str(), out_payload, error_message);
+    }
+
+    if (doc["cmd"].is<ArduinoJson::JsonVariant>()) {
+        set_error(error_message, "unsupported or malformed ship receipts command");
+        return false;
     }
 
     return parse_scene_payload(json, out_payload, error_message);

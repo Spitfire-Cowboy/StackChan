@@ -68,12 +68,12 @@ StackChan primitives.
 - attaches the default avatar
 - rotates through a few Ship Receipts sample beats
 - uses:
-  - status text for the beat label
+  - an app-local label for the beat mode
   - avatar speech for the beat line
   - built-in emotions for expression
   - head motion for staging
   - RGB color changes for mood
-  - built-in notification audio for cueing
+  - `play_notification` metadata (audio playback is not implemented in this app shell)
 - uses the standard home indicator and status bar
 
 This keeps the seam app-local while proving a stronger point than the original

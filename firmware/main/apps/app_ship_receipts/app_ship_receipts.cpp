@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: Apache-2.0
  */
 #include "app_ship_receipts.h"
 #include <apps/common/common.h>
@@ -14,7 +14,10 @@
 #include <stackchan/stackchan.h>
 #include <smooth_lvgl.hpp>
 #include <algorithm>
+#include <atomic>
 #include <cmath>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <string_view>
 #include <tuple>
 
@@ -22,6 +25,8 @@ using namespace mooncake;
 using namespace stackchan;
 
 namespace {
+
+std::atomic<bool> websocket_service_starting{false};
 
 int clampValue(int value, int min_value, int max_value)
 {
@@ -133,10 +138,6 @@ void AppShipReceipts::onOpen()
     }
 
     GetHAL().startBleServer();
-    GetHAL().startWebSocketAvatarService([&](std::string_view msg) {
-        LvglLockGuard lock;
-        loading_page->setMessage(msg);
-    });
 
     {
         LvglLockGuard lock;
@@ -148,6 +149,13 @@ void AppShipReceipts::onOpen()
 
         view::create_home_indicator([&]() { close(); }, 0x93C5FD, 0x0F172A);
         view::create_status_bar(0x93C5FD, 0x0F172A);
+
+        _beat_label = lv_label_create(lv_screen_active());
+        lv_obj_set_width(_beat_label, 300);
+        lv_obj_align(_beat_label, LV_ALIGN_TOP_MID, 0, 8);
+        lv_obj_set_style_text_align(_beat_label, LV_TEXT_ALIGN_CENTER, 0);
+        lv_obj_set_style_text_color(_beat_label, lv_color_hex(0x0F172A), 0);
+        lv_label_set_text(_beat_label, "SHIP.RECEIPTS");
     }
 
     GetHAL().onBleConfigData.connect([&](const char* data) { enqueueSceneJson(data ? data : ""); });
@@ -159,6 +167,19 @@ void AppShipReceipts::onOpen()
 
     enterDemoRotation();
     view::pop_a_toast(buildAppReadyMessage(_selected_demo_mode), view::ToastType::Info, 1800);
+
+    if (!websocket_service_starting.exchange(true)) {
+        auto task_created = xTaskCreate(
+            [](void*) {
+                GetHAL().startWebSocketAvatarService({});
+                vTaskDelete(nullptr);
+            },
+            "ship_receipts_ws", 4096, nullptr, 3, nullptr);
+        if (task_created != pdPASS) {
+            websocket_service_starting = false;
+            mclog::tagError(getAppInfo().name, "failed to create websocket startup task");
+        }
+    }
 }
 
 void AppShipReceipts::onRunning()
@@ -168,6 +189,11 @@ void AppShipReceipts::onRunning()
     std::string queued_scene;
     if (dequeueSceneJson(queued_scene)) {
         handleQueuedCommand(queued_scene);
+    }
+
+    if (_beat_label) {
+        auto label = buildStatusLabel(_active_scene);
+        lv_label_set_text(_beat_label, label.c_str());
     }
 
     GetStackChan().update();
@@ -199,6 +225,10 @@ void AppShipReceipts::onClose()
     GetHAL().onWsTextMessage.clear();
     view::destroy_home_indicator();
     view::destroy_status_bar();
+    if (_beat_label) {
+        lv_obj_delete(_beat_label);
+        _beat_label = nullptr;
+    }
 
     GetHAL().requestWarmReboot(1);
 }
@@ -224,11 +254,8 @@ void AppShipReceipts::applyBeat(const ship_receipts::ScenePayload& beat)
     auto speech   = buildSpeech(beat);
 
     if (display) {
-        auto status = buildStatusLabel(beat);
-        display->SetStatus(status.c_str());
         display->SetEmotion(resolveEmotion(beat));
         display->SetChatMessage("assistant", speech.c_str());
-        display->ShowNotification(status.c_str(), 1400);
     }
 
     mclog::tagInfo(getAppInfo().name, "apply beat id='{}' mode='{}' template='{}' sticky={} status='{}'", beat.scene_id,

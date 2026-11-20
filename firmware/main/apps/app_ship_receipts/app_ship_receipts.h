@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: Apache-2.0
  */
 #pragma once
 #include "ship_receipts_scene.h"
@@ -9,6 +9,7 @@
 #include <array>
 #include <cstdint>
 #include <deque>
+#include <lvgl.h>
 #include <mutex>
 #include <string>
 
@@ -70,4 +71,5 @@ private:
     SequenceState _sequence_state = SequenceState::DemoRotation;
     std::string _selected_demo_mode = "local";
     ship_receipts::ScenePayload _active_scene{};
+    lv_obj_t* _beat_label = nullptr;
 };
