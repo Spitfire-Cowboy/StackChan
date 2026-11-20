@@ -30,6 +30,14 @@ public:
     void onClose() override;
 
 private:
+    struct QueuedMessage {
+        std::string json;
+        bool is_control = false;
+    };
+
+    static constexpr size_t kMaxPendingSceneMessages = 16;
+    static constexpr size_t kMaxPendingSceneBytes    = 8192;
+
     enum class SequenceState {
         DemoRotation = 0,
         LiveOverride,
@@ -65,7 +73,8 @@ private:
     void advanceBeat();
 
     std::mutex _queue_mutex;
-    std::deque<std::string> _pending_scene_json;
+    std::deque<QueuedMessage> _pending_scene_json;
+    size_t _pending_scene_bytes = 0;
     uint32_t _beat_started_at = 0;
     size_t _beat_index        = 0;
     SequenceState _sequence_state = SequenceState::DemoRotation;

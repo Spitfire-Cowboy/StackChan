@@ -171,7 +171,7 @@ void AppShipReceipts::onOpen()
     if (!websocket_service_starting.exchange(true)) {
         auto task_created = xTaskCreate(
             [](void*) {
-                GetHAL().startWebSocketAvatarService({});
+                GetHAL().startWebSocketAvatarService([](std::string_view) {});
                 vTaskDelete(nullptr);
             },
             "ship_receipts_ws", 4096, nullptr, 3, nullptr);
@@ -363,8 +363,34 @@ std::string AppShipReceipts::statusSummary() const
 
 void AppShipReceipts::enqueueSceneJson(std::string json)
 {
+    ship_receipts::ControlAction action;
+    const bool is_control = ship_receipts::parse_control_command(json.c_str(), action);
+
+    if (json.size() > kMaxPendingSceneBytes) {
+        mclog::tagWarn(getAppInfo().name, "drop oversized ship receipts message ({} bytes)",
+                       static_cast<unsigned>(json.size()));
+        return;
+    }
+
     std::lock_guard<std::mutex> lock(_queue_mutex);
-    _pending_scene_json.push_back(std::move(json));
+    while (_pending_scene_json.size() >= kMaxPendingSceneMessages ||
+           _pending_scene_bytes + json.size() > kMaxPendingSceneBytes) {
+        auto stale_scene = std::find_if(_pending_scene_json.begin(), _pending_scene_json.end(),
+                                        [](const QueuedMessage& message) { return !message.is_control; });
+        if (stale_scene != _pending_scene_json.end()) {
+            _pending_scene_bytes -= stale_scene->json.size();
+            _pending_scene_json.erase(stale_scene);
+            continue;
+        }
+        if (!is_control) {
+            mclog::tagWarn(getAppInfo().name, "drop ship receipts scene while control queue is full");
+            return;
+        }
+        _pending_scene_bytes -= _pending_scene_json.front().json.size();
+        _pending_scene_json.pop_front();
+    }
+    _pending_scene_bytes += json.size();
+    _pending_scene_json.push_back({std::move(json), is_control});
 }
 
 bool AppShipReceipts::dequeueSceneJson(std::string& out_json)
@@ -373,7 +399,8 @@ bool AppShipReceipts::dequeueSceneJson(std::string& out_json)
     if (_pending_scene_json.empty()) {
         return false;
     }
-    out_json = std::move(_pending_scene_json.front());
+    _pending_scene_bytes -= _pending_scene_json.front().json.size();
+    out_json = std::move(_pending_scene_json.front().json);
     _pending_scene_json.pop_front();
     return true;
 }
@@ -437,6 +464,7 @@ void AppShipReceipts::clearBeat()
     _beat_started_at = 0;
     std::lock_guard<std::mutex> lock(_queue_mutex);
     _pending_scene_json.clear();
+    _pending_scene_bytes = 0;
 }
 
 void AppShipReceipts::advanceBeat()
