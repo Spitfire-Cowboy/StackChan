@@ -265,8 +265,11 @@ python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py -
 python3 firmware/main/apps/app_ship_receipts/tools/emit_ship_receipts_scene.py --scene local --format set-mode
 ```
 
-The `ws-text` format emits the `name` + `content` shape expected by the app's
-websocket text-message ingest path.
+The `ws-text` format emits only the UTF-8 JSON body containing the `name` +
+`content` shape expected by the app. A websocket host must wrap those bytes in
+the firmware's binary text-message packet: byte `0x07`, a four-byte big-endian
+JSON byte length, then the UTF-8 JSON body. Sending the helper output as a plain
+websocket text frame does not reach the app's ingest path.
 
 The `ble-config` format is the exact JSON shape accepted by the existing BLE
 config characteristic.

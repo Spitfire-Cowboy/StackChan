@@ -26,7 +26,14 @@ using namespace stackchan;
 
 namespace {
 
-std::atomic<bool> websocket_service_starting{false};
+enum class WebsocketStartupState {
+    Idle = 0,
+    ConnectingNetwork,
+    ReadyToRegister,
+    Registered,
+};
+
+std::atomic<WebsocketStartupState> websocket_startup_state{WebsocketStartupState::Idle};
 
 int clampValue(int value, int min_value, int max_value)
 {
@@ -168,22 +175,31 @@ void AppShipReceipts::onOpen()
     enterDemoRotation();
     view::pop_a_toast(buildAppReadyMessage(_selected_demo_mode), view::ToastType::Info, 1800);
 
-    if (!websocket_service_starting.exchange(true)) {
+    auto expected_state = WebsocketStartupState::Idle;
+    if (websocket_startup_state.compare_exchange_strong(expected_state, WebsocketStartupState::ConnectingNetwork)) {
         auto task_created = xTaskCreate(
             [](void*) {
-                GetHAL().startWebSocketAvatarService([](std::string_view) {});
+                GetHAL().startNetwork([](std::string_view) {});
+                websocket_startup_state = WebsocketStartupState::ReadyToRegister;
                 vTaskDelete(nullptr);
             },
-            "ship_receipts_ws", 4096, nullptr, 3, nullptr);
+            "ship_receipts_net", 4096, nullptr, 3, nullptr);
         if (task_created != pdPASS) {
-            websocket_service_starting = false;
-            mclog::tagError(getAppInfo().name, "failed to create websocket startup task");
+            websocket_startup_state = WebsocketStartupState::Idle;
+            mclog::tagError(getAppInfo().name, "failed to create network startup task");
         }
     }
 }
 
 void AppShipReceipts::onRunning()
 {
+    auto expected_state = WebsocketStartupState::ReadyToRegister;
+    if (websocket_startup_state.compare_exchange_strong(expected_state, WebsocketStartupState::Registered)) {
+        // onRunning is invoked by GetMooncake().update(), so ability registration
+        // stays serialized with Mooncake's otherwise non-thread-safe update loop.
+        GetHAL().startWebSocketAvatarService([](std::string_view) {});
+    }
+
     LvglLockGuard lock;
 
     std::string queued_scene;
